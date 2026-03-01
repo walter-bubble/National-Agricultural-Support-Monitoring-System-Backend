@@ -8,9 +8,6 @@ public interface FarmerService {
     List<Farmer> getAllFarmers();
     Farmer getFarmerById(Long id);
     Farmer getFarmerByNationalId(String nationalId);
-
-    Farmer getByNationalId(String nationalId);
-
     Farmer addFarmer(Farmer farmer);
     Farmer updateFarmer(Long id, Farmer farmer);
     void deleteFarmer(Long id);

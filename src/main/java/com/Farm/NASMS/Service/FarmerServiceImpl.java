@@ -1,44 +1,36 @@
 package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.Farmer;
+import com.Farm.NASMS.Repository.FarmerRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public class FarmerServiceImpl implements FarmerService {
-
-
+    private FarmerRepository farmerRepository;
     @Override
     public List<Farmer> getAllFarmers() {
-        return List.of();
+        return farmerRepository.findAll();
     }
-
     @Override
     public Farmer getFarmerById(Long id) {
-        return null;
+        return farmerRepository.findById(id).orElseThrow(()-> new RuntimeException("Farmer not found!"));
     }
-
     @Override
     public Farmer getFarmerByNationalId(String nationalId) {
-        return null;
+        return farmerRepository.findById(Long.valueOf(nationalId)).orElseThrow(()-> new RuntimeException("Farmer not found!"));
     }
-
-    @Override
-    public Farmer getByNationalId(String nationalId) {
-        return null;
-    }
-
     @Override
     public Farmer addFarmer(Farmer farmer) {
-        return null;
+        return farmerRepository.save(farmer);
     }
-
     @Override
     public Farmer updateFarmer(Long id, Farmer farmer) {
-        return null;
+        return farmerRepository.save(farmer);
     }
-
     @Override
     public void deleteFarmer(Long id) {
-
+        Farmer farmer = getFarmerById(id);
+        farmerRepository.delete(farmer);
     }
 }

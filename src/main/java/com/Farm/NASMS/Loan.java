@@ -10,11 +10,21 @@ public class Loan {
     private Long id;//for loan records
 
     @ManyToOne
-    @JoinColumn(name="farmer_id")//connect to farmer table
+    @JoinColumn(name = "farmer_id")//connect to farmer table
     private Farmer farmer;
 
     private double amount;
     private String status;
     private LocalDate issuedDate;
     private LocalDate dueDate;
+
+    public void setStatus(String status) {
+        this.status=status;
+    }
+
+    public void setFarmer(Farmer farmer) {
+        this.farmer=farmer;
+    }
 }
+
+

@@ -18,8 +18,8 @@ public class LoanController {
     }
     //create loan
     @PostMapping("/farmer/{farmerId}")
-        public createLoan(@PathVariable Long farmerId, @RequestBody Loan loan){
-            return loanService.createLoan(farmerId,Loan);
+        public Loan createLoan(@PathVariable Long farmerId, @RequestBody Loan loan){
+            return loanService.createLoan(farmerId,loan);
         }
         //get list of loans
         @GetMapping
@@ -28,7 +28,7 @@ public class LoanController {
         }
         //select loan
         @GetMapping("/{id}")
-    public Loan getLoanById(@PathVariable Long id){
+    public Loan getLoansById(@PathVariable Long id){
         return loanService.getLoansById(id);
         }
         //get the loan
@@ -39,7 +39,7 @@ public class LoanController {
     //update the loan
     @PutMapping("/id/{id}")
     public Loan updateLoanByFarmer(@PathVariable Long id, @RequestBody String status){
-        return loanService.updateLoanStatus(id,status);
+        return loanService.updateLoanByFarmer(id,status);
     }
     //delete loan
     @DeleteMapping("/{id}")
