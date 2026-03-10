@@ -1,8 +1,9 @@
 package com.Farm.NASMS.Service;
 
-import org.springframework.boot.security.autoconfigure.SecurityProperties;
+import com.Farm.NASMS.User;
+
 
 public interface AuthService {
-SecurityProperties.User register(SecurityProperties.User user);
-String login(String username,String password);
+User register(User user);
+    String login(String userName, String password);
 }

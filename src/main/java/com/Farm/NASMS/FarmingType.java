@@ -1,6 +1,6 @@
 package com.Farm.NASMS;
 
-public enum ProductCategory {
+public enum FarmingType {
     CROP_FARMING,
     HORTICULTURE,
     LIVESTOCK_FARMING,

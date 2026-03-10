@@ -1,21 +1,18 @@
 package com.Farm.NASMS;
 
 import org.apache.coyote.Adapter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-@EnableWebSecurity
 @Configuration
-public class SecurityConfig implements WebSecurityConfigurer{
-    @Override
-    public void init(SecurityBuilder builder) {
-
-    }
-
-    @Override
-    public void configure(SecurityBuilder builder) {
-
+public class SecurityConfig{
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 }

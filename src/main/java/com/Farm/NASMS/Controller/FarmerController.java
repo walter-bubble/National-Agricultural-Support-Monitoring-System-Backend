@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/farmers")
 public class FarmerController {
-    @Autowired
    private final FarmerService farmerService;
     public FarmerController(FarmerService farmerService){
         this.farmerService = farmerService;
@@ -19,7 +18,7 @@ public class FarmerController {
     public List<Farmer> getAllFarmers(){
         return farmerService.getAllFarmers();
     }
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public Farmer getFarmerById(@PathVariable Long id){
         return farmerService.getFarmerById(id);
     }

@@ -1,34 +1,35 @@
 package com.Farm.NASMS.Service;
 
+import com.Farm.NASMS.User;
 import com.Farm.NASMS.Repository.UserRepository;
-import org.apache.catalina.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.security.autoconfigure.SecurityProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final PasswordEncoder passwordEncoder;
+    public AuthServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder=passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
     @Override
-    public SecurityProperties.User register(SecurityProperties.User user) {
-        //encode password
-        User.setPassword(PasswordEncoder.encode(user.getPassword()));
-        //save user in db
-        User savedUser= (User) userRepository.save(user);
+    public User register(User user) {
+        // encode password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // save
+    User savedUser = userRepository.save(user);
+        // hide password in response
         savedUser.setPassword(null);
-        return userRepository.save(user);
+        return savedUser;
     }
     @Override
-    public String login(String username, String password) {
-        User user = userRepository.findUserByUserName(username)
-        if (!PasswordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("invalid password");
+    public String login(String userName, String password) {
+        User user = userRepository.findByUserName(userName).orElseThrow(()->new RuntimeException());
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
         }
-        return jwtService.generateToken(user);
+        return "Login successful";
     }
 }

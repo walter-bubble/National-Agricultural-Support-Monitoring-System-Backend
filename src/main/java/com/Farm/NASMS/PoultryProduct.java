@@ -1,4 +1,5 @@
 package com.Farm.NASMS;
 
-public class PoultryProduct {
+public enum PoultryProduct {
+    CHICKEN,TURKEY, DUCK, GOOSE, QUAIL;
 }

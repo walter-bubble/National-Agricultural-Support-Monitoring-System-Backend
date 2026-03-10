@@ -2,10 +2,11 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.Farmer;
 import com.Farm.NASMS.Repository.FarmerRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
 public class FarmerServiceImpl implements FarmerService {
     private FarmerRepository farmerRepository;
     @Override
