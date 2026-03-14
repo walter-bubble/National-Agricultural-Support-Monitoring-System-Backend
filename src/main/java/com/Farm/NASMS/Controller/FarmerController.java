@@ -23,7 +23,7 @@ public class FarmerController {
         return farmerService.getFarmerById(id);
     }
     @GetMapping("/search/{nationalId}")
-    public Farmer getFarmerByNationalId(@PathVariable String nationalId){
+    public Farmer getFarmerByNationalId(@PathVariable Long nationalId){
         return farmerService.getFarmerByNationalId(nationalId);
     }
     @PostMapping

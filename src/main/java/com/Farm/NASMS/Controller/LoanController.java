@@ -32,9 +32,9 @@ public class LoanController {
         return loanService.getLoansById(id);
         }
         //get the loan
-    @GetMapping("/farmer/{farmerId}")
-    public List<Loan> getLoansByFarmer(@PathVariable Long farmerId){
-        return loanService.getLoansByFarmer(farmerId);
+    @GetMapping("/farmer/{farmerNationalId}")
+    public List<Loan> getLoansByFarmerNationalId(@PathVariable Long farmerNationalId){
+        return loanService.getLoansByFarmer(farmerNationalId);
     }
     //update the loan
     @PutMapping("/id/{id}")

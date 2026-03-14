@@ -7,7 +7,7 @@ import java.util.List;
 public interface FarmerService {
     List<Farmer> getAllFarmers();
     Farmer getFarmerById(Long id);
-    Farmer getFarmerByNationalId(String nationalId);
+    Farmer getFarmerByNationalId(Long nationalId);
     Farmer addFarmer(Farmer farmer);
     Farmer updateFarmer(Long id, Farmer farmer);
     void deleteFarmer(Long id);

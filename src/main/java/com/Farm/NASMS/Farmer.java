@@ -20,7 +20,7 @@ public class Farmer {
     private String name;
 
     @Column(unique=true)
-    private long nationalId;
+    private Long nationalId;
 
     private String phoneNumber;
     private String email;
@@ -76,11 +76,11 @@ public class Farmer {
         this.phoneNumber = phoneNumber;
     }
 
-    public long getNationalId() {
+    public Long getNationalId() {
         return nationalId;
     }
 
-    public void setNationalId(long nationalId) {
+    public void setNationalId(Long nationalId) {
         this.nationalId = nationalId;
     }
 
