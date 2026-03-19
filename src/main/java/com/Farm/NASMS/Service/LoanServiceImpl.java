@@ -2,27 +2,34 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.Farmer;
 import com.Farm.NASMS.Loan;
+import com.Farm.NASMS.LoanPackage;
 import com.Farm.NASMS.Repository.FarmerRepository;
+import com.Farm.NASMS.Repository.LoanPackageRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 @Service
 public class LoanServiceImpl implements LoanService {
-    @Autowired
     private FarmerRepository farmerRepository;
     private LoanRepository loanRepository;
-    public LoanServiceImpl(FarmerRepository farmerRepository, LoanRepository loanRepository){
+    private LoanPackageRepository loanPackageRepository;
+    public LoanServiceImpl(FarmerRepository farmerRepository, LoanRepository loanRepository,LoanPackageRepository loanPackageRepository){
         this.farmerRepository=farmerRepository;
         this.loanRepository=loanRepository;
+        this.loanPackageRepository=loanPackageRepository;
     }
     @Override
-    public Loan createLoan(Long farmerId, Loan loan) {
+    public Loan createLoanFromPackage(Long farmerId, String loanCode) {
         Farmer farmer = farmerRepository.findById(farmerId)
                 .orElseThrow(()->new RuntimeException("Farmer not found"));
-        loan.setFarmer(farmer);
-        loan.setStatus("pending");
+        //now we get the loan
+        LoanPackage loanPackage=loanPackageRepository.findById(loanCode)
+                .orElseThrow(()->new RuntimeException("loan package not found"));
+        //we create the loan now
+       Loan loan = Loan.createLoanFromPackage(farmer,loanPackage);
         return loanRepository.save(loan);
     }
 
@@ -37,11 +44,11 @@ public class LoanServiceImpl implements LoanService {
 
     }
     @Override
-    public List<Loan> getLoansByFarmer(Long farmerId) {
-        return loanRepository.findByFarmerId(farmerId);
+    public List<Loan> getLoansByFarmer(Long farmerId,String status) {
+        return loanRepository.findByFarmerNationalIdAndStatus(farmerId,status);
     }
     @Override
-    public Loan updateLoanByFarmer(Long id, String status) {
+    public Loan updateLoanStatus(Long id, String status) {
         Loan loan =getLoansById(id);
         loan.setStatus(status.toUpperCase());
         return loanRepository.save(loan);

@@ -2,7 +2,6 @@ package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.Farmer;
 import com.Farm.NASMS.Service.FarmerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

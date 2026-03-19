@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface LoanRepository  extends JpaRepository<Loan, Long> {
     List<Loan> findByFarmerNationalIdAndStatus(Long farmerId,String status);
+    List<Loan>findByFarmerNationalId(Long farmerId);
 }
