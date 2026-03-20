@@ -30,7 +30,4 @@ public class ProductController {
         productService.deleteProduct(id);
         return "Product deleted Successfully";
     }
-
-
-
 }

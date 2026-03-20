@@ -38,5 +38,4 @@ public class FarmerController {
         farmerService.deleteFarmer(id);
         return "Farmer deleted successfully";
     }
-    
 }
