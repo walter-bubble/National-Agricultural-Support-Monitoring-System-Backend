@@ -2,25 +2,23 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.LoanPackage;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class LoanPackageServiceImpl implements LoanPackageService {
     private LoanPackageRepository loanPackageRepository;
     public LoanPackageServiceImpl(LoanPackageRepository loanPackageRepository){
         this.loanPackageRepository=loanPackageRepository;
     }
-
     @Override
     public LoanPackage createLoanPackage(LoanPackage loanPackage) {
         return loanPackageRepository.save(loanPackage);
     }
-
     @Override
     public List<LoanPackage> getAllLoanPackage() {
         return loanPackageRepository.findAll();
     }
-
     @Override
     public LoanPackage getLoanPackageByCode(String loanCode) {
         return loanPackageRepository.findById(loanCode)
@@ -37,7 +35,6 @@ public class LoanPackageServiceImpl implements LoanPackageService {
         existing.setDescription(loanPackage.getDescription());
         return loanPackageRepository.save(existing);
     }
-
     @Override
     public void deleteLoanPackage(String loanCode) {
         LoanPackage existing=getLoanPackageByCode(loanCode);

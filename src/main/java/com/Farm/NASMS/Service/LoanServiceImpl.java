@@ -44,8 +44,8 @@ public class LoanServiceImpl implements LoanService {
 
     }
     @Override
-    public List<Loan> getLoansByFarmer(Long farmerId,String status) {
-        return loanRepository.findByFarmerNationalIdAndStatus(farmerId,status);
+    public List<Loan> getLoansByFarmer(Long nationalId,String status) {
+        return loanRepository.findByFarmerNationalIdAndStatus(nationalId,status);
     }
     @Override
     public Loan updateLoanStatus(Long id, String status) {

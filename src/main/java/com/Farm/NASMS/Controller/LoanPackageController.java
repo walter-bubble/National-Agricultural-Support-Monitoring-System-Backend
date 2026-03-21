@@ -13,7 +13,7 @@ private LoanPackageService loanPackageService;
 public LoanPackageController(LoanPackageService loanPackageService){
     this.loanPackageService=loanPackageService;
   }
-@PostMapping("/")
+@PostMapping
     public LoanPackage createLoanPackage(@RequestBody LoanPackage loanPackage){
     return loanPackageService.createLoanPackage(loanPackage);
   }
