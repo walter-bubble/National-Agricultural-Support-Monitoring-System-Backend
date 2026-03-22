@@ -22,8 +22,8 @@ public class LoanServiceImpl implements LoanService {
         this.loanPackageRepository=loanPackageRepository;
     }
     @Override
-    public Loan createLoanFromPackage(Long farmerId, String loanCode) {
-        Farmer farmer = farmerRepository.findById(farmerId)
+    public Loan createLoanFromPackage(Long nationalId, String loanCode) {
+        Farmer farmer = farmerRepository.findByNationalId(nationalId)
                 .orElseThrow(()->new RuntimeException("Farmer not found"));
         //now we get the loan
         LoanPackage loanPackage=loanPackageRepository.findById(loanCode)

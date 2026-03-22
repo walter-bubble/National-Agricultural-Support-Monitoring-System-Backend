@@ -18,8 +18,8 @@ public class LoanController {
     }
     //create loan
     @PostMapping("/farmer/{nationalId}/package/{loanCode}")
-        public Loan createLoan(@PathVariable Long farmerId,@PathVariable String loanCode){
-            return loanService.createLoanFromPackage(farmerId,loanCode);
+        public Loan createLoan(@PathVariable Long nationalId,@PathVariable String loanCode){
+            return loanService.createLoanFromPackage(nationalId,loanCode);
         }
         //get list of loans
         @GetMapping
@@ -27,7 +27,7 @@ public class LoanController {
         return loanService.getAllLoans();
         }
         //select loan
-        @GetMapping("/{id}")
+        @GetMapping("/{loanCode}")
     public Loan getLoansById(@PathVariable Long id){
         return loanService.getLoansById(id);
         }
@@ -44,8 +44,8 @@ public class LoanController {
     }
     //update the loan
     @PutMapping("/id/{id}")
-    public Loan updateLoanByFarmer(@PathVariable Long id, @RequestBody String status){
-        return loanService.updateLoanStatus(id,status);
+    public Loan updateLoanByFarmer(@PathVariable Long nationalId, @RequestBody String status){
+        return loanService.updateLoanStatus(nationalId,status);
     }
     //delete loan
     @DeleteMapping("/{id}")
