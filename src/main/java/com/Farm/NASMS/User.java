@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import javax.annotation.processing.Generated;
 
 @Entity
-@Table(name="users")
+@Table(name="users",uniqueconstraints={@UniqueConstraint(columnNames = "userName")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
