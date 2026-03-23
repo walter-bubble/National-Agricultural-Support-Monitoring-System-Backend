@@ -1,18 +1,23 @@
 package com.Farm.NASMS;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.Nullable;
 
 import javax.annotation.processing.Generated;
 
 @Entity
-@Table(name="users",uniqueconstraints={@UniqueConstraint(columnNames = "userName")})
+@Table(name="users", uniqueConstraints={@UniqueConstraint(columnNames = "user_name")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "username cannot be blank")
+    @Column(name="user_name")
     private String userName;
+
+    @NotBlank(message = "password cannot be blank")
     private String password;
     private String role;
 
