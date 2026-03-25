@@ -32,7 +32,6 @@ public class LoanServiceImpl implements LoanService {
        Loan loan = Loan.createLoanFromPackage(farmer,loanPackage);
         return loanRepository.save(loan);
     }
-
     @Override
     public List<Loan> getAllLoans() {
         return loanRepository.findAll();
@@ -41,7 +40,6 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Loan getLoansById(Long id) {
         return loanRepository.findById(id).orElseThrow(()->new RuntimeException("Loan not Found!"));
-
     }
     @Override
     public List<Loan> getLoansByFarmer(Long nationalId,String status) {

@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MarketTransactionRepository extends JpaRepository<MarketTransaction, Long> {
     List<MarketTransaction>findBySellerId(Long sellerId);
     List<MarketTransaction>findByBuyerId(Long buyerId);
+    Optional<MarketTransaction> findByProductId(String productId);
 }

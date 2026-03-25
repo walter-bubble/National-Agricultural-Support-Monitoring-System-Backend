@@ -16,7 +16,7 @@ public class MarketController {
         this.marketTransactionService=marketTransactionService;
     }
     @PostMapping("/transaction")
-   public ResponseEntity<MarketTransactionService>createTransaction(@RequestBody MarketTransaction transaction){
+   public ResponseEntity<MarketTransaction>createTransaction(@RequestBody MarketTransaction transaction){
         MarketTransaction saved = marketTransactionService.createTransaction(transaction);
        return ResponseEntity.ok(saved);
     }
