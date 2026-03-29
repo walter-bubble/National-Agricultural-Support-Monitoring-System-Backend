@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface MarketTransactionRepository extends JpaRepository<MarketTransaction, Long> {
     List<MarketTransaction>findBySellerId(Long sellerId);
     List<MarketTransaction>findByBuyerId(Long buyerId);
-    Optional<MarketTransaction> findByProductId(String productId);
+    Optional<MarketTransaction> findByProductCode(String productCode);
+    void deleteByCode(String productCode);
 }

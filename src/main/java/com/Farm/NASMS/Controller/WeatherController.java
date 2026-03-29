@@ -6,14 +6,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/weather")
 public class WeatherController {
-    private WeatherService weatherService;
-    public WeatherController(WeatherService weatherService){
-        this.weatherService=weatherService;
-    }
-    @GetMapping
+   private WeatherService weatherService;
+public WeatherController(WeatherService weatherService){
+       this.weatherService=weatherService;
+}
+@GetMapping
     public String getWeather(@RequestParam String city){
-        return weatherService.getWeatherByCity(city);
+       return weatherService.getWeatherByCity(city);
     }
-    
-
 }

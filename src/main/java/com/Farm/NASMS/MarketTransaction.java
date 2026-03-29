@@ -21,20 +21,20 @@ public class MarketTransaction {
     private Long buyerId;
 
     private String productName;
-    private String productId;
+    private String productCode;
     private double quantity;
     private double price;
 
     private LocalDateTime transactionDate = LocalDateTime.now();
 
-    public MarketTransaction(String sellerType, String sellerName, String buyerName, String productName, double quantity, double price,String productId){
+    public MarketTransaction(String sellerType, String sellerName, String buyerName, String productName, double quantity, double price,String productCode){
         this.sellerType=sellerType;
         this.sellerName=sellerName;
         this.buyerName=buyerName;
         this.productName=productName;
         this.quantity=quantity;
         this.price=price;
-        this.productId=productId;
+        this.productCode=productCode;
     }
 
     public long getId() {
@@ -117,11 +117,11 @@ public class MarketTransaction {
         this.buyerId = buyerId;
     }
 
-    public String getProductId() {
-        return productId;
+    public String getProductCode() {
+        return productCode;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 }

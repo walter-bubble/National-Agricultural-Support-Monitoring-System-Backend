@@ -11,7 +11,7 @@ MarketTransaction createTransaction(MarketTransaction transaction);
 List <MarketTransaction>  getAllTransactions();
 List<MarketTransaction> getTransactionBySellerId(Long sellerId);
 List<MarketTransaction> getTransactionByBuyerId(Long buyerId);
-Optional<MarketTransaction> getTransactionByProductId(String productId);
+Optional<MarketTransaction> getTransactionByProductCode(String productCode);
 MarketTransaction updateTransaction(MarketTransaction marketTransaction);
-void deleteTransaction(String productId);
+void deleteTransaction(String productCode);
 }

@@ -35,24 +35,24 @@ public class MarketController {
         List<MarketTransaction> list = marketTransactionService.getTransactionByBuyerId(buyerId);
         return ResponseEntity.ok(list);
     }
-    @PutMapping("/transaction/{productId}")
-    public ResponseEntity<MarketTransaction> updateTransaction(@PathVariable String productId, @RequestBody MarketTransaction transaction){
-        return marketTransactionService.getTransactionByProductId(productId)
+    @PutMapping("/transaction/{productCode}")
+    public ResponseEntity<MarketTransaction> updateTransaction(@PathVariable String productCode, @RequestBody MarketTransaction transaction){
+        return marketTransactionService.getTransactionByProductCode(productCode)
                 .map(existing ->{
                     existing.setSellerId(transaction.getSellerId());
                     existing.setSellerType(transaction.getSellerType());
                     existing.setBuyerId(transaction.getBuyerId());
                     existing.setPrice(transaction.getPrice());
                     existing.setQuantity(transaction.getQuantity());
-                    existing.setProductId(transaction.getProductId());
+                    existing.setProductCode(transaction.getProductCode());
                     existing.setProductName(transaction.getProductName());
                     MarketTransaction updated = marketTransactionService.updateTransaction(existing);
                             return ResponseEntity.ok(updated);
                 }).orElse(ResponseEntity.notFound().build());
     }
-    @DeleteMapping("/transaction/{productId}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable String productId){
-        marketTransactionService.deleteTransaction(productId);
+    @DeleteMapping("/transaction/{productCode}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable String productCode){
+        marketTransactionService.deleteTransaction(productCode);
         return ResponseEntity.noContent().build();
     }
 }
