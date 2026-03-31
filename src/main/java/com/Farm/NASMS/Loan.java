@@ -17,6 +17,9 @@ public class Loan {
     private Farmer farmer;
 
     @ManyToOne
+    private FarmingSeason season;
+
+    @ManyToOne
     @JoinColumn(name = "loan_code")
     private LoanPackage loanPackage;
 
@@ -166,5 +169,13 @@ public class Loan {
 
     public void setTotalPayment(double totalPayment) {
         this.totalPayment = totalPayment;
+    }
+
+    public FarmingSeason getSeason() {
+        return season;
+    }
+
+    public void setSeason(FarmingSeason season) {
+        this.season = season;
     }
 }

@@ -2,6 +2,7 @@ package com.Farm.NASMS.Repository;
 
 import com.Farm.NASMS.MarketTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,4 +14,7 @@ public interface MarketTransactionRepository extends JpaRepository<MarketTransac
     List<MarketTransaction>findByBuyerId(Long buyerId);
     Optional<MarketTransaction> findByProductCode(String productCode);
     void deleteByCode(String productCode);
+
+    @Query("SELECT SUM(m.amount) FROM MarketTransaction m WHERE m.seasonId= :seasonId")
+    double getTotalSalesBySeason(Long seasonId);
 }

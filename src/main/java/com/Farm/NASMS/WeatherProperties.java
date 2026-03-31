@@ -3,8 +3,6 @@ package com.Farm.NASMS;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.net.URI;
-
 @Component
 @ConfigurationProperties(prefix="weather.api")
 public class WeatherProperties {

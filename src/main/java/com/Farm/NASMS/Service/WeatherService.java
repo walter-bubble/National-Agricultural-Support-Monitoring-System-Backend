@@ -16,7 +16,7 @@ public class WeatherService {
         this.restTemplate=restTemplate;
     }
     public WeatherResponse getWeather(String city){
-        String url = UriComponentsBuilder.fromUri(weatherProperties.getBaseUrl())
+        String url = UriComponentsBuilder.fromUriString(weatherProperties.getBaseUrl())
                 .queryParam("q", city)
                 .queryParam("appid", weatherProperties.getKey())
                 .queryParam("units", weatherProperties.getUnits())

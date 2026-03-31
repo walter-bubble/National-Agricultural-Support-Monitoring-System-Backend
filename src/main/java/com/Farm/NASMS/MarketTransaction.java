@@ -1,9 +1,6 @@
 package com.Farm.NASMS;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +9,9 @@ public class MarketTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @ManyToOne
+    private FarmingSeason season;
 
     private String sellerType;
     private String sellerName;
@@ -123,5 +123,13 @@ public class MarketTransaction {
 
     public void setProductCode(String productCode) {
         this.productCode = productCode;
+    }
+
+    public FarmingSeason getSeason() {
+        return season;
+    }
+
+    public void setSeason(FarmingSeason season) {
+        this.season = season;
     }
 }
