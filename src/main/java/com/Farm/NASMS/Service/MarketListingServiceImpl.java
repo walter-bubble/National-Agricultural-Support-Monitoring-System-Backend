@@ -25,7 +25,7 @@ public class MarketListingServiceImpl implements MarketListingService{
 
     @Override
     public Optional<MarketListing> getProductByCode(String productCode) {
-        return marketListingRepository.findProductByCode(productCode);
+        return marketListingRepository.findByProductCode(productCode);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class MarketListingServiceImpl implements MarketListingService{
 
     @Override
     public MarketListing getProductByName(String productName) {
-        return (MarketListing) marketListingRepository.findProductByName(productName);
+        return (MarketListing) marketListingRepository.findByProductName(productName);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MarketListingServiceImpl implements MarketListingService{
 
     @Override
     public void deleteListing(String productCode) {
-        marketListingRepository.deleteByCode(productCode);
+        marketListingRepository.deleteByProductCode(productCode);
 
     }
 }

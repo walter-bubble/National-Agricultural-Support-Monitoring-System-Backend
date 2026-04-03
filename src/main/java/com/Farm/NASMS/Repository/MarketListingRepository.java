@@ -9,9 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface MarketListingRepository extends JpaRepository<MarketListing,Long> {
-    List<MarketListing> findByProductCode(String productCode);
     List<MarketListing>findBySellerId(Long sellerId);
-    List<MarketListing>findProductByName(String productName);
-    Optional<MarketListing> findProductByCode(String productCode);
-    void deleteByCode(String productCode);
+    List<MarketListing>findByProductName(String productName);
+    Optional<MarketListing> findByProductCode(String productCode);
+    void deleteByProductCode(String productCode);
 }

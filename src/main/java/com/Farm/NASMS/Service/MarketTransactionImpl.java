@@ -46,7 +46,7 @@ public class MarketTransactionImpl implements MarketTransactionService{
 
     @Override
     public void deleteTransaction(String productCode) {
-        marketTransactionRepository.deleteByCode(productCode);
+        marketTransactionRepository.deleteByProductCode(productCode);
 
     }
 }

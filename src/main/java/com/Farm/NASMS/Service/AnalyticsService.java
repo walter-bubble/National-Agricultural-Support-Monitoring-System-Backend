@@ -1,4 +1,13 @@
 package com.Farm.NASMS.Service;
 
-public class AnalyticsService {
+import com.Farm.NASMS.SeasonAnalyticsDto;
+import com.Farm.NASMS.SeasonComparisonDto;
+import com.Farm.NASMS.SeasonGraphDto;
+
+import java.util.List;
+
+public interface AnalyticsService {
+SeasonAnalyticsDto getSeasonAnalytics(Long seasonId);
+SeasonComparisonDto compareSeasons(Long season1,Long season2);
+List<SeasonGraphDto> getAllSeasonAnalytics();
 }
