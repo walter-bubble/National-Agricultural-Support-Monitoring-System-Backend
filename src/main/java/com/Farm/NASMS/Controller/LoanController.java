@@ -44,8 +44,14 @@ public class LoanController {
     }
     //update the loan
     @PutMapping("/id/{id}")
-    public Loan updateLoanByFarmer(@PathVariable Long nationalId, @RequestBody String status){
-        return loanService.updateLoanStatus(nationalId,status);
+    public Loan updateLoanByFarmer(@PathVariable Long id, @RequestBody String status){
+        return loanService.updateLoanStatus(id,status);
+    }
+    //payloan
+    @PutMapping("/{id}/pay")
+    public Loan payLoan(@PathVariable Long id){
+        return loanService.payLoan(id);
+
     }
     //delete loan
     @DeleteMapping("/{id}")

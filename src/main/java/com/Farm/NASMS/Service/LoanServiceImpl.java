@@ -28,8 +28,26 @@ public class LoanServiceImpl implements LoanService {
         //now we get the loan
         LoanPackage loanPackage=loanPackageRepository.findById(loanCode)
                 .orElseThrow(()->new RuntimeException("loan package not found"));
-        //we create the loan now
-       Loan loan = Loan.createLoanFromPackage(farmer,loanPackage);
+        Loan loan = new Loan();
+        loan.setFarmer(farmer);
+        loan.setLoanPackage(loanPackage);
+        loan.setAmount(loanPackage.getAmount());
+        loan.setInterestRate(loanPackage.getInterestRate());
+        loan.setMonthlyPenalty(loanPackage.getMonthlyPenalty());
+       loan.setDurationMonths(loanPackage.getDurationMonths());
+       loan.setDurationYears(loanPackage.getDurationYears());
+
+       LocalDateTime now = LocalDateTime.now();
+       loan.setIssuedDate(now);
+       loan.setDueDate(now
+               .plusYears(loanPackage.getDurationYears())
+               .plusMonths(loanPackage.getDurationMonths()));
+       //calculate payment
+        double time = loanPackage.getDurationYears() + (loanPackage.getDurationMonths()/12.0);
+        double interest = loanPackage.getAmount() * (loanPackage.getInterestRate()/100) * time;
+        double totalPayment = loanPackage.getAmount() + interest;
+        loan.setTotalPayment(totalPayment);
+        loan.setStatus("pending");
         return loanRepository.save(loan);
     }
     @Override
@@ -51,6 +69,16 @@ public class LoanServiceImpl implements LoanService {
         loan.setStatus(status.toUpperCase());
         return loanRepository.save(loan);
 
+    }
+    @Override
+    public Loan payLoan(Long id){
+        Loan loan = getLoansById(id);
+        LocalDateTime paymentDate =LocalDateTime.now();
+        loan.setPaymentDate(paymentDate);
+        double totalDue = loan.calculateTotalDue(paymentDate);
+        loan.setTotalPayment(totalDue);
+        loan.setStatus("completed");
+        return loanRepository.save(loan);
     }
     @Override
     public void deleteLoan(Long id) {
