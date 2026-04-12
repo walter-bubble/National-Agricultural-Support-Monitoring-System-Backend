@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Entity
 public class Loan {
@@ -12,59 +13,94 @@ public class Loan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;//for loan records
 
-    @ManyToOne
-    @JoinColumn(name = "national_id")//connect to farmer table
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "farmer_id")//connect to farmer table
     private Farmer farmer;
 
-    @ManyToOne
-    private FarmingSeason season;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="season_id")
+    private FarmingSeason farmingSeason;
 
-    @ManyToOne
-    @JoinColumn(name = "loan_code")
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="loan_code")
     private LoanPackage loanPackage;
 
+    @OneToMany(mappedBy = "loan",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<LoanPayment> loanPayments;
+
+    //loan details
+    @Column(nullable = false)
     private double amount;
+
+    @Column(nullable = false)
     private double interestRate;
-    private double monthlyPenalty;
-    private int durationYears;
+
+    @Column(nullable = false)
     private int durationMonths;
+
+    private double monthlyPenalty;
     private double totalPayment;
-    private LocalDateTime paymentDate;
     private LocalDateTime issuedDate;
     private LocalDateTime dueDate;
-    private String status;
 
+    @Enumerated(EnumType.STRING)
+    private LoanStatus status;
+
+    //Audit
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    //the life cycle
+    @PrePersist
+    protected void onCreate(){
+        createdAt=LocalDateTime.now();
+        if(issuedDate==null){
+            issuedDate=LocalDateTime.now();
+        }
+    }
+    @PreUpdate
+    protected void onUpdate(){
+        updatedAt=LocalDateTime.now();
+    }
+
+    //business logic here
     public Loan(){}
     public static Loan createLoanFromPackage(Farmer farmer, LoanPackage loanPackage) {
         Loan loan = new Loan();
         loan.setFarmer(farmer);
-        loan.setTotalPayment(calculateTotalPayment(loan));
-        loan.setLoanPackage(loanPackage);
+
         loan.setAmount(loanPackage.getAmount());
         loan.setInterestRate(loanPackage.getInterestRate());
-        loan.setMonthlyPenalty(loan.getMonthlyPenalty());
-        loan.setDurationYears(loanPackage.getDurationYears());
         loan.setDurationMonths(loanPackage.getDurationMonths());
+        loan.setMonthlyPenalty(loanPackage.getMonthlyPenalty());
+        loan.setTotalPayment(calculateTotalPayment(loan));
 
         LocalDateTime now = LocalDateTime.now();
         loan.setIssuedDate(now);
-        loan.setDueDate(now.plusYears(loanPackage.getDurationYears())
-                .plusMonths(loanPackage.getDurationMonths()));
-        loan.setStatus("Pending");
+        loan.setDueDate(now.plusMonths(loanPackage.getDurationMonths()));
+        loan.setStatus(LoanStatus.PENDING);
         return loan;
     }
     private static double calculateTotalPayment(Loan loan){
-        return loan.getAmount() + (loan.getAmount()*loan.getInterestRate()/100);
+        return loan.getAmount() + (loan.getAmount()*loan.getInterestRate()/100*loan.getDurationMonths()/12);
+    }
+    public double getRemainingBalance(){
+        double paid=(loanPayments==null) ? 0:
+                loanPayments.stream().mapToDouble(LoanPayment:: getAmountPaid).sum();
+        return totalPayment-paid;
     }
     public double calculatePenalty(LocalDateTime dueDate){
-        if(paymentDate != null && paymentDate.isAfter(this.dueDate)){
-            long monthsLate = ChronoUnit.MONTHS.between(this.dueDate,paymentDate);
+        if(dueDate != null && dueDate.isAfter(this.dueDate)){
+            long monthsLate = ChronoUnit.MONTHS.between(this.dueDate,dueDate);
             return monthsLate * monthlyPenalty;
         }
         return 0;
     }
     public double calculateTotalDue(LocalDateTime paymentDate){
         return this.totalPayment + calculatePenalty(paymentDate);
+    }
+    public boolean isOverDue(){
+        return LocalDateTime.now().isAfter(dueDate) && getRemainingBalance()>0;
     }
 
     public Long getId() {
@@ -114,15 +150,6 @@ public class Loan {
     public void setMonthlyPenalty(double monthlyPenalty) {
         this.monthlyPenalty = monthlyPenalty;
     }
-
-    public int getDurationYears() {
-        return durationYears;
-    }
-
-    public void setDurationYears(int durationYears) {
-        this.durationYears = durationYears;
-    }
-
     public int getDurationMonths() {
         return durationMonths;
     }
@@ -146,23 +173,6 @@ public class Loan {
     public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
     }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(LocalDateTime paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
     public double getTotalPayment() {
         return totalPayment;
     }
@@ -171,11 +181,43 @@ public class Loan {
         this.totalPayment = totalPayment;
     }
 
-    public FarmingSeason getSeason() {
-        return season;
+    public FarmingSeason getFarmingSeason() {
+        return farmingSeason;
     }
 
-    public void setSeason(FarmingSeason season) {
-        this.season = season;
+    public void setFarmingSeason(FarmingSeason farmingSeason) {
+        this.farmingSeason = farmingSeason;
+    }
+
+    public List<LoanPayment> getLoanPayments() {
+        return loanPayments;
+    }
+
+    public void setLoanPayments(List<LoanPayment> loanPayments) {
+        this.loanPayments = loanPayments;
+    }
+
+    public LoanStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(LoanStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

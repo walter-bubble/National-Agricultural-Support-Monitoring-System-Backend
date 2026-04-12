@@ -1,44 +1,21 @@
 package com.Farm.NASMS;
 
-import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
 @Entity
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Enumerated(EnumType.STRING)
-    private FarmingType farmingType;
 
-    private String productName;
+    private String name;
+    private double quantity;
+    private double unitPrice;
 
-    @Enumerated(EnumType.STRING)
-    private ProductStatus productStatus;
     @ManyToOne
-    @JoinColumn(name = "farmer_id")
     private Farmer farmer;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public Product(){}
-
-    public Product(FarmingType farmingType,String productName,ProductStatus productStatus, Farmer farmer) {
-        this.farmingType=farmingType;
-        this.productName=productName;
-        this.productStatus=productStatus;
-        this.farmer=farmer;
-    }
-    @PrePersist
-    protected void onCreate(){
-        createdAt=LocalDateTime.now();
-    }
-    @PreUpdate
-    protected void onUpdate(){
-        updatedAt=LocalDateTime.now();
-    }
     public Long getId() {
         return id;
     }
@@ -47,28 +24,28 @@ public class Product {
         this.id = id;
     }
 
-    public FarmingType getFarmingType() {
-        return farmingType;
+    public String getName() {
+        return name;
     }
 
-    public void setFarmingType(FarmingType farmingType) {
-        this.farmingType = farmingType;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getProductName() {
-        return productName;
+    public double getQuantity() {
+        return quantity;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 
-    public ProductStatus getProductStatus() {
-        return productStatus;
+    public double getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setProductStatus(ProductStatus productStatus) {
-        this.productStatus = productStatus;
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public Farmer getFarmer() {
@@ -77,22 +54,6 @@ public class Product {
 
     public void setFarmer(Farmer farmer) {
         this.farmer = farmer;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
 

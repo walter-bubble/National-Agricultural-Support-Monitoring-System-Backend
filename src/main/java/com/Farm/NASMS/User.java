@@ -17,6 +17,10 @@ public class User {
     @Column(name="user_name")
     private String userName;
 
+    @NotBlank(message="userEmail cannot be blank")
+    @Column(name="email_address")
+    private String emailAddress;
+
     @NotBlank(message = "password cannot be blank")
     private String password;
     private String role;
@@ -50,4 +54,11 @@ public class User {
         this.id = id;
     }
 
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
 }

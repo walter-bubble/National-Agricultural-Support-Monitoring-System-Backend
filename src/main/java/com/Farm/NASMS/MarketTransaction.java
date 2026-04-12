@@ -11,7 +11,12 @@ public class MarketTransaction {
     private long id;
 
     @ManyToOne
+    @JoinColumn(name="season_id",nullable = false)
     private FarmingSeason season;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     private String sellerType;
     private String sellerName;
@@ -26,6 +31,8 @@ public class MarketTransaction {
     private double price;
 
     private LocalDateTime transactionDate = LocalDateTime.now();
+
+    public MarketTransaction(){}
 
     public MarketTransaction(String sellerType, String sellerName, String buyerName, String productName, double quantity, double price,String productCode){
         this.sellerType=sellerType;
@@ -131,5 +138,13 @@ public class MarketTransaction {
 
     public void setSeason(FarmingSeason season) {
         this.season = season;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

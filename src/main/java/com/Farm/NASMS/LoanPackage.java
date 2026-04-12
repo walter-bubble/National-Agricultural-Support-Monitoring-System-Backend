@@ -9,9 +9,7 @@ public class LoanPackage {
     private String loanCode;
 
     private double amount;
-    private double totalPayment;
     private double interestRate;
-    private int durationYears;
     private int durationMonths;
     private double monthlyPenalty;
     private String description;
@@ -41,15 +39,6 @@ public class LoanPackage {
     public void setInterestRate(double interestRate) {
         this.interestRate = interestRate;
     }
-
-    public int getDurationYears() {
-        return durationYears;
-    }
-
-    public void setDurationYears(int durationYears) {
-        this.durationYears = durationYears;
-    }
-
     public int getDurationMonths() {
         return durationMonths;
     }
@@ -72,13 +61,5 @@ public class LoanPackage {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getTotalPayment() {
-        return totalPayment;
-    }
-
-    public void setTotalPayment(double totalPayment) {
-        this.totalPayment = totalPayment;
     }
 }

@@ -1,11 +1,9 @@
 package com.Farm.NASMS;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class FarmingSeason {
@@ -16,8 +14,13 @@ public class FarmingSeason {
     private String seasonName;
     private LocalDate startDate;
     private LocalDate endDate;
-
     private boolean closed=false;
+
+    @OneToMany
+    private List<Loan> loans;
+
+    @OneToMany
+    private List<MarketTransaction>marketTransactions;
 
     public Long getId() {
         return id;
@@ -57,5 +60,21 @@ public class FarmingSeason {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
+    }
+
+    public List<MarketTransaction> getMarketTransactions() {
+        return marketTransactions;
+    }
+
+    public void setMarketTransactions(List<MarketTransaction> marketTransactions) {
+        this.marketTransactions = marketTransactions;
     }
 }

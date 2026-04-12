@@ -9,7 +9,7 @@ public interface LoanService {
     List<Loan> getAllLoans();
     Loan getLoansById(Long id);
     List<Loan>getLoansByFarmer(Long nationalId,String status);
-    Loan updateLoanStatus(Long nationalId, String status);
+    Loan updateLoanStatus(String loanCode, String status);
     Loan payLoan(Long id);
     void deleteLoan(Long id);
 }

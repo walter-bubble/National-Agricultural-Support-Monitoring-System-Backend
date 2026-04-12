@@ -27,6 +27,7 @@ public class MarketListing {
         this.price=price;
     }
 
+    public MarketListing(){}
     public String getProductCode() {
         return productCode;
     }

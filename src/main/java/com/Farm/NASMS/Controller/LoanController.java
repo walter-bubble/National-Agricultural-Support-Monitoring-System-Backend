@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/loans")
@@ -27,7 +28,7 @@ public class LoanController {
         return loanService.getAllLoans();
         }
         //select loan
-        @GetMapping("/{loanCode}")
+        @GetMapping("/{id}")
     public Loan getLoansById(@PathVariable Long id){
         return loanService.getLoansById(id);
         }
@@ -43,11 +44,11 @@ public class LoanController {
         }
     }
     //update the loan
-    @PutMapping("/id/{id}")
-    public Loan updateLoanByFarmer(@PathVariable Long id, @RequestBody String status){
-        return loanService.updateLoanStatus(id,status);
+    @PutMapping("/{loanCode}/status")
+    public Loan updateLoanByFarmer(@PathVariable String loanCode,@RequestBody Map<String,String> request){
+        return loanService.updateLoanStatus(loanCode, request.get("status"));
     }
-    //payloan
+    //payLoan
     @PutMapping("/{id}/pay")
     public Loan payLoan(@PathVariable Long id){
         return loanService.payLoan(id);

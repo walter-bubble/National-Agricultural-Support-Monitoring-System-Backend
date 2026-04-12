@@ -3,18 +3,21 @@ package com.Farm.NASMS.Repository;
 import com.Farm.NASMS.Loan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LoanRepository  extends JpaRepository<Loan, Long> {
     List<Loan> findByFarmerNationalIdAndStatus(Long nationalId,String status);
     List<Loan>findByFarmerNationalId(Long nationalId);
-    @Query("SELECT COUNT(1) FROM Loan L WHERE L.season.id=:seasonId")
-    Long countLoansBySeason(Long seasonId);
+    Optional<Loan>findByLoanPackage_LoanCode(String loanCode);
+    @Query("SELECT COUNT(1) FROM Loan l WHERE l.farmingSeason.id=:seasonId")
+    Long countLoansBySeason(@Param("seasonId")Long seasonId);
 
-    @Query("SELECT COUNT(1) FROM Loan L WHERE L.season.id=:seasonId AND L.status='Approved'")
-    Long countApprovedLoans(Long seasonId);
+    @Query("SELECT COUNT(1) FROM Loan l WHERE l.farmingSeason.id=:seasonId AND l.status='Approved'")
+    Long countApprovedLoans(@Param("seasonId") Long seasonId);
 
-    @Query("SELECT COUNT(1) FROM Loan L WHERE L.season.id=:seasonId")
-    double getTotalLoanAmountBySeason(Long seasonId);
+    @Query("SELECT SUM(l.amount) FROM Loan l WHERE l.farmingSeason.id=:seasonId")
+    double getTotalLoanAmountBySeason(@Param("seasonId") Long seasonId);
 }

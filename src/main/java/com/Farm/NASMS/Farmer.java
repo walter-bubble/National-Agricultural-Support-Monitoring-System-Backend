@@ -2,86 +2,46 @@ package com.Farm.NASMS;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name="farmers", uniqueConstraints = @UniqueConstraint(columnNames = "nationalId"))
 public class Farmer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    @Column(unique=true,nullable = false)
+    private Long nationalId;
+
+    @Column(unique = true)
+    private String phoneNumber;
+
+    @Column(unique=true)
+    private String email;
+
+    private double farmSize;
+    private String titleNumber;
+    private String county;
+    private String subCounty;
+    private String ward;
+
+    @ManyToOne
+    private List<FarmingActivity> activities;
+
+    @ManyToOne
+    private List<Product> products;
+
+    @ManyToOne
+    private List<Loan> loans;
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-
-    @Column(unique=true)
-    private Long nationalId;
-
-    private String phoneNumber;
-    private String email;
-    private double farmSize;
-    private String titleNumber;
-    private String location;
-
-    public String getFarmingType() {
-        return farmingType;
-    }
-
-    public void setFarmingType(String farmingType) {
-        this.farmingType = farmingType;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getTitleNumber() {
-        return titleNumber;
-    }
-
-    public void setTitleNumber(String titleNumber) {
-        this.titleNumber = titleNumber;
-    }
-
-    public double getFarmSize() {
-        return farmSize;
-    }
-
-    public void setFarmSize(double farmSize) {
-        this.farmSize = farmSize;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Long getNationalId() {
-        return nationalId;
-    }
-
-    public void setNationalId(Long nationalId) {
-        this.nationalId = nationalId;
     }
 
     public String getName() {
@@ -92,5 +52,91 @@ public class Farmer {
         this.name = name;
     }
 
-    private String farmingType;
+    public Long getNationalId() {
+        return nationalId;
+    }
+
+    public void setNationalId(Long nationalId) {
+        this.nationalId = nationalId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public double getFarmSize() {
+        return farmSize;
+    }
+
+    public void setFarmSize(double farmSize) {
+        this.farmSize = farmSize;
+    }
+
+    public String getTitleNumber() {
+        return titleNumber;
+    }
+
+    public void setTitleNumber(String titleNumber) {
+        this.titleNumber = titleNumber;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public String getSubCounty() {
+        return subCounty;
+    }
+
+    public void setSubCounty(String subCounty) {
+        this.subCounty = subCounty;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
+    }
+
+    public List<FarmingActivity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<FarmingActivity> activities) {
+        this.activities = activities;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
+    }
 }

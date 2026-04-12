@@ -29,7 +29,6 @@ public class LoanPackageServiceImpl implements LoanPackageService {
         LoanPackage existing = getLoanPackageByCode(loanCode);
         existing.setAmount(loanPackage.getAmount());
         existing.setInterestRate(loanPackage.getInterestRate());
-        existing.setDurationYears(loanPackage.getDurationYears());
         existing.setDurationMonths(loanPackage.getDurationMonths());
         existing.setMonthlyPenalty(loanPackage.getMonthlyPenalty());
         existing.setDescription(loanPackage.getDescription());

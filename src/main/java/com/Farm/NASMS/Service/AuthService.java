@@ -5,5 +5,5 @@ import com.Farm.NASMS.User;
 
 public interface AuthService {
 User register(User user);
-    String login(String userName, String password);
+    String login(String emailAddress, String password);
 }

@@ -21,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
     }
     @Override
     public User register(User user) {
-        if(userRepository.findByUserName(user.getUserName()).isPresent()){
+        if(userRepository.findByEmailAddress(user.getEmailAddress()).isPresent()){
              throw new RuntimeException("user exists");
         }
         // encode password
@@ -33,12 +33,12 @@ public class AuthServiceImpl implements AuthService {
         return savedUser;
     }
 @Override
-    public String login(String userName, String password) {
-        User user = userRepository.findByUserName(userName)
+    public String login(String emailAddress, String password) {
+        User user = userRepository.findByEmailAddress(emailAddress)
                 .orElseThrow(()->new RuntimeException("user not found"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
-        return jwtUtil.generateToken(userName);
+        return jwtUtil.generateToken(emailAddress);
     }
 }
