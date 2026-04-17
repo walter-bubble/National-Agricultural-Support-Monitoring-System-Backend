@@ -1,8 +1,8 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.SeasonAnalyticsDto;
-import com.Farm.NASMS.SeasonComparisonDto;
-import com.Farm.NASMS.SeasonGraphDto;
+import com.Farm.NASMS.dto.SeasonAnalyticsDto;
+import com.Farm.NASMS.dto.SeasonComparisonDto;
+import com.Farm.NASMS.dto.SeasonGraphDto;
 
 import java.util.List;
 

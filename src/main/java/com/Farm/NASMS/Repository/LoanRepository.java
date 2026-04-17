@@ -1,5 +1,7 @@
 package com.Farm.NASMS.Repository;
 
+import com.Farm.NASMS.Farmer;
+import com.Farm.NASMS.FarmingSeason;
 import com.Farm.NASMS.Loan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,5 +21,7 @@ public interface LoanRepository  extends JpaRepository<Loan, Long> {
     Long countApprovedLoans(@Param("seasonId") Long seasonId);
 
     @Query("SELECT SUM(l.amount) FROM Loan l WHERE l.farmingSeason.id=:seasonId")
-    double getTotalLoanAmountBySeason(@Param("seasonId") Long seasonId);
+    Double getTotalLoanAmountBySeason(@Param("seasonId") Long seasonId);
+
+    boolean existsByFarmerAndFarmingSeason(Farmer farmer, FarmingSeason season);
 }

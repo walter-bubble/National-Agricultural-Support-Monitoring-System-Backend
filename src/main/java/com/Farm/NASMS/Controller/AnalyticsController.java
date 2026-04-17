@@ -1,8 +1,8 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.SeasonAnalyticsDto;
-import com.Farm.NASMS.SeasonComparisonDto;
-import com.Farm.NASMS.SeasonGraphDto;
+import com.Farm.NASMS.dto.SeasonAnalyticsDto;
+import com.Farm.NASMS.dto.SeasonComparisonDto;
+import com.Farm.NASMS.dto.SeasonGraphDto;
 import com.Farm.NASMS.Service.AnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +18,7 @@ public class AnalyticsController {
         this.analyticsService=analyticsService;
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("season/{seasonId}")
+    @GetMapping("/season/{seasonId}")
     public ResponseEntity<SeasonAnalyticsDto> getSeasonAnalytics(@PathVariable Long seasonId){
         return ResponseEntity.ok(analyticsService.getSeasonAnalytics(seasonId));
     }

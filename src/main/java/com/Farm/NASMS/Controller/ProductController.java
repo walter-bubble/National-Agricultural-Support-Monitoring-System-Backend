@@ -1,6 +1,7 @@
 package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.Product;
+import com.Farm.NASMS.ProductRequest;
 import com.Farm.NASMS.Service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +19,12 @@ public class ProductController {
         return productService.getAllProduct();
     }
     @PostMapping()
-    public Product addProduct(@RequestBody Product product){
-        return productService.addProduct(product);
+    public Product addProduct(@RequestBody ProductRequest request){
+        return productService.addProduct(request);
     }
     @PutMapping("/{id}")
-    public Product updateProductById(@PathVariable Long id, @RequestBody Product product){
-        return productService.updateProductById(id, product);
+    public Product updateProductById(@PathVariable Long id, @RequestBody ProductRequest request){
+        return productService.updateProductById(id,request);
     }
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable Long id){

@@ -15,6 +15,17 @@ public class FarmingSeason {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean closed=false;
+    private double budget;
+    public boolean isActive(){
+        LocalDate today = LocalDate.now();
+        if(closed || startDate == null || endDate==null){
+            return false;
+        }
+        return !today.isBefore(startDate) && !today.isAfter(endDate);
+    }
+    public boolean shouldAutoClose(){
+        return LocalDate.now().isAfter(endDate);
+    }
 
     @OneToMany
     private List<Loan> loans;
@@ -76,5 +87,13 @@ public class FarmingSeason {
 
     public void setMarketTransactions(List<MarketTransaction> marketTransactions) {
         this.marketTransactions = marketTransactions;
+    }
+
+    public double getBudget() {
+        return budget;
+    }
+
+    public void setBudget(double budget) {
+        this.budget = budget;
     }
 }

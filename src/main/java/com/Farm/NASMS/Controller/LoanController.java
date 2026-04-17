@@ -18,9 +18,10 @@ public class LoanController {
         this.loanService = loanService;
     }
     //create loan
-    @PostMapping("/farmer/{nationalId}/package/{loanCode}")
-        public Loan createLoan(@PathVariable Long nationalId,@PathVariable String loanCode){
-            return loanService.createLoanFromPackage(nationalId,loanCode);
+    @PostMapping("/farmer/{nationalId}/package/{loanCode}/season/{seasonId}")
+        public Loan createLoan(@PathVariable Long nationalId,@PathVariable String loanCode,
+                               @PathVariable Long seasonId){
+            return loanService.createLoanFromPackage(nationalId,loanCode,seasonId);
         }
         //get list of loans
         @GetMapping

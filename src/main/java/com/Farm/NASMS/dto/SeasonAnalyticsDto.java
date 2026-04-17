@@ -1,12 +1,20 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.dto;
 
 public class SeasonAnalyticsDto {
     private String seasonName;
     private Long totalFarmers;
     private Long totalLoans;
-    private Long totalLoansTaken;
+    private Long approvedLoans;
+    private Long rejectedLoans;
     private double totalSupportFunds;
     private double totalSales;
+    private double totalLoanAmount;
+    private double remainingBudget;
+    private double loanUtilizationRate;
+
+    public SeasonAnalyticsDto(){
+
+    }
 
     public String getSeasonName() {
         return seasonName;
@@ -32,14 +40,6 @@ public class SeasonAnalyticsDto {
         this.totalLoans = totalLoans;
     }
 
-    public Long getTotalLoansTaken() {
-        return totalLoansTaken;
-    }
-
-    public void setTotalLoansTaken(Long totalLoansTaken) {
-        this.totalLoansTaken = totalLoansTaken;
-    }
-
     public double getTotalSupportFunds() {
         return totalSupportFunds;
     }
@@ -54,5 +54,45 @@ public class SeasonAnalyticsDto {
 
     public void setTotalSales(double totalSales) {
         this.totalSales = totalSales;
+    }
+
+    public Long getApprovedLoans() {
+        return approvedLoans;
+    }
+
+    public void setApprovedLoans(Long approvedLoans) {
+        this.approvedLoans = approvedLoans;
+    }
+
+    public Long getRejectedLoans() {
+        return rejectedLoans;
+    }
+
+    public void setRejectedLoans(Long rejectedLoans) {
+        this.rejectedLoans = rejectedLoans;
+    }
+
+    public double getTotalLoanAmount() {
+        return totalLoanAmount;
+    }
+
+    public void setTotalLoanAmount(double totalLoanAmount) {
+        this.totalLoanAmount = totalLoanAmount;
+    }
+
+    public double getRemainingBudget() {
+        return remainingBudget;
+    }
+
+    public void setRemainingBudget(double remainingBudget) {
+        this.remainingBudget = remainingBudget;
+    }
+
+    public double getLoanUtilizationRate() {
+        return loanUtilizationRate;
+    }
+
+    public void setLoanUtilizationRate(double loanUtilizationRate) {
+        this.loanUtilizationRate = loanUtilizationRate;
     }
 }

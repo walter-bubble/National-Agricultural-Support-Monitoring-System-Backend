@@ -5,7 +5,7 @@ import com.Farm.NASMS.Loan;
 import java.util.List;
 
 public interface LoanService {
-    <loan> Loan createLoanFromPackage(Long nationalId, String loanCode);
+    <loan> Loan createLoanFromPackage(Long nationalId, String loanCode,Long seasonId);
     List<Loan> getAllLoans();
     Loan getLoansById(Long id);
     List<Loan>getLoansByFarmer(Long nationalId,String status);

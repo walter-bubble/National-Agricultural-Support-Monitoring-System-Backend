@@ -26,16 +26,6 @@ public class Farmer {
     private String county;
     private String subCounty;
     private String ward;
-
-    @ManyToOne
-    private List<FarmingActivity> activities;
-
-    @ManyToOne
-    private List<Product> products;
-
-    @ManyToOne
-    private List<Loan> loans;
-
     public Long getId() {
         return id;
     }
@@ -114,29 +104,5 @@ public class Farmer {
 
     public void setWard(String ward) {
         this.ward = ward;
-    }
-
-    public List<FarmingActivity> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<FarmingActivity> activities) {
-        this.activities = activities;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
-    public List<Loan> getLoans() {
-        return loans;
-    }
-
-    public void setLoans(List<Loan> loans) {
-        this.loans = loans;
     }
 }

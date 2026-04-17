@@ -1,9 +1,13 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.dto;
 
 public class SeasonGraphDto {
     private String seasonName;
-    private double totalSales;
-    private double totalLoans;
+    private String metricType;
+    private double value;
+
+    public SeasonGraphDto(){
+
+    }
 
     public String getSeasonName() {
         return seasonName;
@@ -13,19 +17,19 @@ public class SeasonGraphDto {
         this.seasonName = seasonName;
     }
 
-    public double getTotalSales() {
-        return totalSales;
+    public String getMetricType() {
+        return metricType;
     }
 
-    public void setTotalSales(double totalSales) {
-        this.totalSales = totalSales;
+    public void setMetricType(String metricType) {
+        this.metricType = metricType;
     }
 
-    public double getTotalLoans() {
-        return totalLoans;
+    public double getValue() {
+        return value;
     }
 
-    public void setTotalLoans(double totalLoans) {
-        this.totalLoans = totalLoans;
+    public void setValue(double value) {
+        this.value = value;
     }
 }

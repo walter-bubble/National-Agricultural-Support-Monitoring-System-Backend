@@ -1,10 +1,8 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Farmer;
-import com.Farm.NASMS.Loan;
-import com.Farm.NASMS.LoanPackage;
-import com.Farm.NASMS.LoanStatus;
+import com.Farm.NASMS.*;
 import com.Farm.NASMS.Repository.FarmerRepository;
+import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,25 +10,52 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Service
 public class LoanServiceImpl implements LoanService {
     private FarmerRepository farmerRepository;
     private LoanRepository loanRepository;
     private LoanPackageRepository loanPackageRepository;
-    public LoanServiceImpl(FarmerRepository farmerRepository, LoanRepository loanRepository,LoanPackageRepository loanPackageRepository){
+    private FarmingSeasonRepository farmingSeasonRepository;
+    public LoanServiceImpl(FarmerRepository farmerRepository, LoanRepository loanRepository,LoanPackageRepository loanPackageRepository,FarmingSeasonRepository farmingSeasonRepository){
         this.farmerRepository=farmerRepository;
         this.loanRepository=loanRepository;
         this.loanPackageRepository=loanPackageRepository;
+        this.farmingSeasonRepository=farmingSeasonRepository;
     }
     @Override
-    public Loan createLoanFromPackage(Long nationalId, String loanCode) {
+    public Loan createLoanFromPackage(Long nationalId, String loanCode,Long seasonId) {
         Farmer farmer = farmerRepository.findByNationalId(nationalId)
                 .orElseThrow(()->new RuntimeException("Farmer not found"));
-        //now we get the loan
+        FarmingSeason season= farmingSeasonRepository.findById(seasonId)
+                .orElseThrow(()->new RuntimeException("season not found!"));
         LoanPackage loanPackage=loanPackageRepository.findById(loanCode)
                 .orElseThrow(()->new RuntimeException("loan package not found"));
+
+        // closing of season
+        if(season.shouldAutoClose()) {
+            season.setClosed(true);
+            farmingSeasonRepository.save(season);
+        }
+        //if season is still active
+        if(!season.isActive()){
+            throw new RuntimeException("Loans can only be applied during active season");
+        }
+        //check if loan limit has been exceeded for that season
+        Double totalLoans = loanRepository.getTotalLoanAmountBySeason(season.getId());
+        double total = (totalLoans == null) ? 0:totalLoans;
+        if(total + loanPackage.getAmount() > season.getBudget()){
+            throw new RuntimeException("season budget exceeded!");
+        }
+        //check if farmer has a lona already
+        boolean exists = loanRepository.existsByFarmerAndFarmingSeason(farmer,season);
+        if(exists){
+            throw new RuntimeException("Farmer already has a loan in this season");
+        }
+
         Loan loan = new Loan();
         loan.setFarmer(farmer);
+        loan.setFarmingSeason(season);
         loan.setLoanPackage(loanPackage);
         loan.setAmount(loanPackage.getAmount());
         loan.setInterestRate(loanPackage.getInterestRate());

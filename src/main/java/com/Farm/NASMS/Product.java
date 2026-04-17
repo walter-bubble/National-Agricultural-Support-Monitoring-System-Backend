@@ -1,6 +1,7 @@
 package com.Farm.NASMS;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,8 +11,8 @@ public class Product {
     private Long id;
 
     private String name;
-    private double quantity;
-    private double unitPrice;
+    private double quantityUnit;
+    private double unitPrice_ksh;
 
     @ManyToOne
     private Farmer farmer;
@@ -32,20 +33,20 @@ public class Product {
         this.name = name;
     }
 
-    public double getQuantity() {
-        return quantity;
+    public double getQuantityUnit() {
+        return quantityUnit;
     }
 
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
+    public void setQuantityUnit(double quantityUnit) {
+        this.quantityUnit = quantityUnit;
     }
 
-    public double getUnitPrice() {
-        return unitPrice;
+    public double getUnitPrice_ksh() {
+        return unitPrice_ksh;
     }
 
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
+    public void setUnitPrice_ksh(double unitPrice_ksh) {
+        this.unitPrice_ksh = unitPrice_ksh;
     }
 
     public Farmer getFarmer() {
