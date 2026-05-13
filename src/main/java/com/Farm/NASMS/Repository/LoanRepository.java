@@ -12,7 +12,6 @@ import java.util.Optional;
 
 public interface LoanRepository  extends JpaRepository<Loan, Long> {
     List<Loan> findByFarmerNationalIdAndStatus(Long nationalId,String status);
-    List<Loan>findByFarmerNationalId(Long nationalId);
     Optional<Loan>findByLoanPackage_LoanCode(String loanCode);
     @Query("SELECT COUNT(1) FROM Loan l WHERE l.farmingSeason.id=:seasonId")
     Long countLoansBySeason(@Param("seasonId")Long seasonId);

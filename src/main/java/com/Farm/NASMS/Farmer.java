@@ -7,6 +7,7 @@ import java.util.List;
 @Entity
 @Table(name="farmers", uniqueConstraints = @UniqueConstraint(columnNames = "nationalId"))
 public class Farmer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -105,4 +106,6 @@ public class Farmer {
     public void setWard(String ward) {
         this.ward = ward;
     }
+
+
 }

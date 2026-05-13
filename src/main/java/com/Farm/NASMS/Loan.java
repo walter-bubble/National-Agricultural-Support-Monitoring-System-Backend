@@ -42,6 +42,7 @@ public class Loan {
     private double totalPayment;
     private LocalDateTime issuedDate;
     private LocalDateTime dueDate;
+    private double remainingBalance;
 
     @Enumerated(EnumType.STRING)
     private LoanStatus status;
@@ -86,7 +87,7 @@ public class Loan {
     }
     public double getRemainingBalance(){
         double paid=(loanPayments==null) ? 0:
-                loanPayments.stream().mapToDouble(LoanPayment:: getAmountPaid).sum();
+                loanPayments.stream().mapToDouble(LoanPayment:: getTotalAmountPaid).sum();
         return totalPayment-paid;
     }
     public double calculatePenalty(LocalDateTime dueDate){
@@ -220,4 +221,9 @@ public class Loan {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public void setRemainingBalance(double remainingBalance) {
+        this.remainingBalance = remainingBalance;
+    }
+
 }

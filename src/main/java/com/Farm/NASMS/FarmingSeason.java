@@ -33,6 +33,10 @@ public class FarmingSeason {
     @OneToMany
     private List<MarketTransaction>marketTransactions;
 
+    @OneToMany(mappedBy = "farmingSeason")
+    private List<LoanPackage>loanPackages;
+
+
     public Long getId() {
         return id;
     }
@@ -95,5 +99,13 @@ public class FarmingSeason {
 
     public void setBudget(double budget) {
         this.budget = budget;
+    }
+
+    public List<LoanPackage> getLoanPackages() {
+        return loanPackages;
+    }
+
+    public void setLoanPackages(List<LoanPackage> loanPackages) {
+        this.loanPackages = loanPackages;
     }
 }

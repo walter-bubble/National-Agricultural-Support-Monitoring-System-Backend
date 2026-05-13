@@ -2,6 +2,8 @@ package com.Farm.NASMS;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class LoanPackage {
@@ -13,6 +15,10 @@ public class LoanPackage {
     private int durationMonths;
     private double monthlyPenalty;
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name="season_id")
+    private FarmingSeason farmingSeason;
 
     public LoanPackage(){}
 
@@ -61,5 +67,13 @@ public class LoanPackage {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public FarmingSeason getFarmingSeason() {
+        return farmingSeason;
+    }
+
+    public void setFarmingSeason(FarmingSeason farmingSeason) {
+        this.farmingSeason = farmingSeason;
     }
 }

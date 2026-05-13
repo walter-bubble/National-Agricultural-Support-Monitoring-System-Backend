@@ -1,6 +1,7 @@
 package com.Farm.NASMS;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import org.hibernate.annotations.AnyDiscriminatorImplicitValues;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,14 @@ public class LoanPayment {
     @JoinColumn(name="loan_id",nullable = false)
     private Loan loan;
 
-    private double amountPaid;
+    @Positive(message = "Amount to pay must be greater than zero!")
+    private double amountToPay;
+
+    private double remainingBalance;
+
+    private double TotalAmountPaid;
+
+    @Column(updatable = false)
     private LocalDateTime paymentDate;
 
     @Enumerated(EnumType.STRING)
@@ -37,14 +45,6 @@ public class LoanPayment {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public double getAmountPaid() {
-        return amountPaid;
-    }
-
-    public void setAmountPaid(double amountPaid) {
-        this.amountPaid = amountPaid;
     }
 
     public LocalDateTime getPaymentDate() {
@@ -76,5 +76,29 @@ public class LoanPayment {
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public double getRemainingBalance() {
+        return remainingBalance;
+    }
+
+    public void setRemainingBalance(double remainingBalance) {
+        this.remainingBalance = remainingBalance;
+    }
+
+    public double getAmountToPay() {
+        return amountToPay;
+    }
+
+    public void setAmountToPay(double amountToPay) {
+        this.amountToPay = amountToPay;
+    }
+
+    public double getTotalAmountPaid() {
+        return TotalAmountPaid;
+    }
+
+    public void setTotalAmountPaid(double totalAmountPaid) {
+        TotalAmountPaid = totalAmountPaid;
     }
 }

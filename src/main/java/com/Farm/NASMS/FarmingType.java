@@ -7,5 +7,6 @@ public enum FarmingType {
     MIXED_FARMING,
     POULTRY,
     AQUACULTURE,
-    AGROFORESTRY;
+    AGROFORESTRY,
+    CASHCROPS;
 }
