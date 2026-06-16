@@ -1,15 +1,14 @@
 package com.Farm.NASMS;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class LoanPackage {
     @Id
-    private String loanCode;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    private Long loanId;
     private double amount;
     private double interestRate;
     private int durationMonths;
@@ -22,12 +21,20 @@ public class LoanPackage {
 
     public LoanPackage(){}
 
-    public String getLoanCode() {
-        return loanCode;
+    public Long getId() {
+        return id;
     }
 
-    public void setLoanCode(String loanCode) {
-        this.loanCode = loanCode;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getLoanId() {
+        return loanId;
+    }
+
+    public void setLoanId(Long loanId) {
+        this.loanId = loanId;
     }
 
     public double getAmount() {
@@ -45,6 +52,7 @@ public class LoanPackage {
     public void setInterestRate(double interestRate) {
         this.interestRate = interestRate;
     }
+
     public int getDurationMonths() {
         return durationMonths;
     }

@@ -16,8 +16,8 @@ public class LoanPaymentController {
         this.loanPaymentService=loanPaymentService;
     }
     @PostMapping("/{loanCode}")
-    public ResponseEntity<LoanPaymentResponse> payLoan(@PathVariable String loanCode, @RequestBody LoanPaymentRequest request){
-        LoanPaymentResponse loanPayment = loanPaymentService.makePayment(loanCode,request);
+    public ResponseEntity<LoanPaymentResponse> payLoan(@PathVariable Long id, @RequestBody LoanPaymentRequest request){
+        LoanPaymentResponse loanPayment = loanPaymentService.makePayment(id,request);
         return ResponseEntity.ok(loanPayment);
     }
 }

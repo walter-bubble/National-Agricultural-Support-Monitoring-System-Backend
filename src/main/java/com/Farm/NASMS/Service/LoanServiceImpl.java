@@ -24,12 +24,12 @@ public class LoanServiceImpl implements LoanService {
         this.farmingSeasonRepository=farmingSeasonRepository;
     }
     @Override
-    public Loan createLoanFromPackage(Long nationalId, String loanCode,Long seasonId) {
+    public Loan createLoanFromPackage(Long nationalId, Long id,Long seasonId) {
         Farmer farmer = farmerRepository.findByNationalId(nationalId)
                 .orElseThrow(()->new RuntimeException("Farmer not found"));
         FarmingSeason season= farmingSeasonRepository.findById(seasonId)
                 .orElseThrow(()->new RuntimeException("season not found!"));
-        LoanPackage loanPackage=loanPackageRepository.findById(loanCode)
+        LoanPackage loanPackage=loanPackageRepository.findById(id)
                 .orElseThrow(()->new RuntimeException("loan package not found"));
 
         // closing of season
@@ -90,14 +90,6 @@ public class LoanServiceImpl implements LoanService {
         return loanRepository.findByFarmerNationalIdAndStatus(nationalId,status);
     }
     @Override
-    public Loan updateLoanStatus(String loanCode,String status) {
-        Loan loan =loanRepository.findByLoanPackage_LoanCode(loanCode)
-                .orElseThrow(()-> new RuntimeException("Loan not found!"));
-        loan.setStatus(LoanStatus.valueOf(status.trim().toUpperCase()));
-        return loanRepository.save(loan);
-
-    }
-    @Override
     public Loan payLoan(Long id){
         Loan loan = getLoansById(id);
         LocalDateTime dueDate =LocalDateTime.now();
@@ -112,5 +104,13 @@ public class LoanServiceImpl implements LoanService {
         //check if loan exists
         Loan loan = getLoansById(id);
         loanRepository.delete(loan);
+    }
+
+    @Override
+    public Loan updateLoanStatus(Long id, String status) {
+        Loan loan = loanRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Loan not Found!"));
+        loan.setStatus(LoanStatus.valueOf(status.toUpperCase()));
+        return loanRepository.save(loan);
     }
 }

@@ -6,6 +6,6 @@ import com.Farm.NASMS.dto.LoanPaymentRequest;
 import com.Farm.NASMS.dto.LoanPaymentResponse;
 
 public interface LoanPaymentService {
-LoanPaymentResponse makePayment(String loanCode, LoanPaymentRequest request);
+LoanPaymentResponse makePayment(Long id, LoanPaymentRequest request);
 
 }

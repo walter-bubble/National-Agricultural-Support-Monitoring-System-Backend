@@ -7,7 +7,7 @@ import java.util.List;
 public interface LoanPackageService {
 LoanPackage createLoanPackage(LoanPackage loanPackage);
 List<LoanPackage>getAllLoanPackage();
-LoanPackage getLoanPackageByCode(String loanCode);
-void deleteLoanPackage(String loanCode);
-LoanPackage updateLoanPackage(String loanCode,LoanPackage loanPackage);
+LoanPackage getLoanPackageById(Long id);
+void deleteLoanPackage(Long id);
+LoanPackage updateLoanPackage(Long id,LoanPackage loanPackage);
 }

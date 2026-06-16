@@ -21,16 +21,16 @@ public LoanPackageController(LoanPackageService loanPackageService){
     public List<LoanPackage> getAllLoanPackage(){
     return loanPackageService.getAllLoanPackage();
   }
-  @GetMapping("/{loanCode}")
-    public LoanPackage getLoanPackageByCode(@PathVariable String loanCode){
-    return loanPackageService.getLoanPackageByCode(loanCode);
+  @GetMapping("/{id}")
+    public LoanPackage getLoanPackageById(@PathVariable Long id){
+    return loanPackageService.getLoanPackageById(id);
   }
-  @PutMapping("/{loanCode}")
-  public LoanPackage updateLoanPackage(@PathVariable String loanCode,@RequestBody LoanPackage loanPackage){
-    return loanPackageService.updateLoanPackage(loanCode,loanPackage);
+  @PutMapping("/{id}")
+  public LoanPackage updateLoanPackage(@PathVariable Long id,@RequestBody LoanPackage loanPackage){
+    return loanPackageService.updateLoanPackage(id,loanPackage);
   }
     @DeleteMapping("/{loanCode}")
-    public void deleteLoanPackage(@PathVariable String loanCode){
-    loanPackageService.deleteLoanPackage(loanCode);
+    public void deleteLoanPackage(@PathVariable Long id){
+    loanPackageService.deleteLoanPackage(id);
   }
 }

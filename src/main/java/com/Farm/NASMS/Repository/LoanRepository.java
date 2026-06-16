@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface LoanRepository  extends JpaRepository<Loan, Long> {
     List<Loan> findByFarmerNationalIdAndStatus(Long nationalId,String status);
-    Optional<Loan>findByLoanPackage_LoanCode(String loanCode);
+
     @Query("SELECT COUNT(1) FROM Loan l WHERE l.farmingSeason.id=:seasonId")
     Long countLoansBySeason(@Param("seasonId")Long seasonId);
 
@@ -23,4 +23,6 @@ public interface LoanRepository  extends JpaRepository<Loan, Long> {
     Double getTotalLoanAmountBySeason(@Param("seasonId") Long seasonId);
 
     boolean existsByFarmerAndFarmingSeason(Farmer farmer, FarmingSeason season);
+
+    List<Loan> findByLoanPackage_id(Long id);
 }

@@ -20,13 +20,13 @@ public class LoanPackageServiceImpl implements LoanPackageService {
         return loanPackageRepository.findAll();
     }
     @Override
-    public LoanPackage getLoanPackageByCode(String loanCode) {
-        return loanPackageRepository.findById(loanCode)
+    public LoanPackage getLoanPackageById(Long id) {
+        return loanPackageRepository.findById(id)
                 .orElseThrow(()->new RuntimeException("Loan Package not found!"));
     }
     @Override
-    public LoanPackage updateLoanPackage(String loanCode,LoanPackage loanPackage){
-        LoanPackage existing = getLoanPackageByCode(loanCode);
+    public LoanPackage updateLoanPackage(Long id,LoanPackage loanPackage){
+        LoanPackage existing = getLoanPackageById(id);
         existing.setAmount(loanPackage.getAmount());
         existing.setInterestRate(loanPackage.getInterestRate());
         existing.setDurationMonths(loanPackage.getDurationMonths());
@@ -35,8 +35,8 @@ public class LoanPackageServiceImpl implements LoanPackageService {
         return loanPackageRepository.save(existing);
     }
     @Override
-    public void deleteLoanPackage(String loanCode) {
-        LoanPackage existing=getLoanPackageByCode(loanCode);
+    public void deleteLoanPackage(Long id) {
+        LoanPackage existing=getLoanPackageById(id);
         loanPackageRepository.delete(existing);
     }
 }

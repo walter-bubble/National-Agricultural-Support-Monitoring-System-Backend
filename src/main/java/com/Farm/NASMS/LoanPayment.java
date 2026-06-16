@@ -22,6 +22,7 @@ public class LoanPayment {
     private double amountToPay;
 
     private double remainingBalance;
+    private double previousTotal;
 
     private double TotalAmountPaid;
 
@@ -96,6 +97,14 @@ public class LoanPayment {
 
     public double getTotalAmountPaid() {
         return TotalAmountPaid;
+    }
+
+    public double getPreviousTotal() {
+        return previousTotal;
+    }
+
+    public void setPreviousTotal(double previousTotal) {
+        this.previousTotal = previousTotal;
     }
 
     public void setTotalAmountPaid(double totalAmountPaid) {

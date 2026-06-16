@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.Long.sum;
 
@@ -25,9 +26,12 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
     }
     @Override
     @Transactional
-    public LoanPaymentResponse makePayment(String loanCode, LoanPaymentRequest request) {
-        Loan loan = loanRepository.findByLoanPackage_LoanCode(loanCode)
-                .orElseThrow(() -> new RuntimeException("loan does not exist"));
+    public LoanPaymentResponse makePayment(Long id, LoanPaymentRequest request) {
+        List<Loan> loans = loanRepository.findByLoanPackage_id(id);
+        if (loans.isEmpty()) {
+            throw new RuntimeException("loan does not exist");
+        }
+        Loan loan = loans.get(0);
         double amount = request.getAmountToPay();
         PaymentMethod paymentMethod = request.getPaymentMethod();
         if (amount <= 0) {
@@ -56,11 +60,12 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
         loanRepository.save(loan);
         LoanPayment saved = loanPaymentRepository.save(payment);
 
-        double totalAmountPaid = loanPaymentRepository
+        double previousTotal = loanPaymentRepository
                 .findByLoan(loan)
                 .stream()
-                .mapToDouble(LoanPayment:getAmountToPay)
+                .mapToDouble(LoanPayment::getAmountToPay)
                 .sum();
+        double totalAmountPaid = previousTotal + amount;
 
 
         LoanPaymentResponse response = new LoanPaymentResponse();

@@ -27,16 +27,6 @@ public class FarmingSeason {
         return LocalDate.now().isAfter(endDate);
     }
 
-    @OneToMany
-    private List<Loan> loans;
-
-    @OneToMany
-    private List<MarketTransaction>marketTransactions;
-
-    @OneToMany(mappedBy = "farmingSeason")
-    private List<LoanPackage>loanPackages;
-
-
     public Long getId() {
         return id;
     }
@@ -77,22 +67,6 @@ public class FarmingSeason {
         this.closed = closed;
     }
 
-    public List<Loan> getLoans() {
-        return loans;
-    }
-
-    public void setLoans(List<Loan> loans) {
-        this.loans = loans;
-    }
-
-    public List<MarketTransaction> getMarketTransactions() {
-        return marketTransactions;
-    }
-
-    public void setMarketTransactions(List<MarketTransaction> marketTransactions) {
-        this.marketTransactions = marketTransactions;
-    }
-
     public double getBudget() {
         return budget;
     }
@@ -101,11 +75,4 @@ public class FarmingSeason {
         this.budget = budget;
     }
 
-    public List<LoanPackage> getLoanPackages() {
-        return loanPackages;
-    }
-
-    public void setLoanPackages(List<LoanPackage> loanPackages) {
-        this.loanPackages = loanPackages;
-    }
 }
