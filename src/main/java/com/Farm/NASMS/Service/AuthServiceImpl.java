@@ -1,10 +1,9 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.JwtUtil;
-import com.Farm.NASMS.User;
+import com.Farm.NASMS.security.JwtUtil;
+import com.Farm.NASMS.model.User;
 import com.Farm.NASMS.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Service;
 
 @Service

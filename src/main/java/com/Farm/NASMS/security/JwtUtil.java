@@ -1,4 +1,4 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Repository;
 
-import com.Farm.NASMS.MarketListing;
+import com.Farm.NASMS.model.MarketListing;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

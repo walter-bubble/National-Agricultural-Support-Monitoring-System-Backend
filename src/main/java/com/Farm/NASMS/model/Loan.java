@@ -1,8 +1,8 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.model;
 
+import com.Farm.NASMS.enums.LoanStatus;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;

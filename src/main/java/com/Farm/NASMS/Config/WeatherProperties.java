@@ -1,4 +1,4 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.Config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

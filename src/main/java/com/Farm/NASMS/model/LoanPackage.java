@@ -1,4 +1,4 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.model;
 
 import jakarta.persistence.*;
 

@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.User;
+import com.Farm.NASMS.model.User;
 
 
 public interface AuthService {

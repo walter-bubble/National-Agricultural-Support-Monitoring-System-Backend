@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Repository;
 
-import com.Farm.NASMS.Farmer;
+import com.Farm.NASMS.model.Farmer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

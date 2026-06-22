@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.Farmer;
+import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.Service.FarmerService;
 import org.springframework.web.bind.annotation.*;
 

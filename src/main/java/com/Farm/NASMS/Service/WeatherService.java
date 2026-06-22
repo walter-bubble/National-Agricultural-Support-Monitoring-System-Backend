@@ -1,7 +1,7 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.WeatherProperties;
-import com.Farm.NASMS.WeatherResponse;
+import com.Farm.NASMS.Config.WeatherProperties;
+import com.Farm.NASMS.dto.WeatherResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

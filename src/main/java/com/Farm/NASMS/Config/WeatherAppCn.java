@@ -1,4 +1,4 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

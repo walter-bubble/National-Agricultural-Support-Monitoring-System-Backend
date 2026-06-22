@@ -1,4 +1,4 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.enums;
 
 public enum CropProduct {
     //cereals

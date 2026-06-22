@@ -1,9 +1,9 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Loan;
-import com.Farm.NASMS.LoanPayment;
-import com.Farm.NASMS.LoanStatus;
-import com.Farm.NASMS.PaymentMethod;
+import com.Farm.NASMS.model.Loan;
+import com.Farm.NASMS.model.LoanPayment;
+import com.Farm.NASMS.enums.LoanStatus;
+import com.Farm.NASMS.enums.PaymentMethod;
 import com.Farm.NASMS.Repository.LoanPaymentRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
 import com.Farm.NASMS.dto.LoanPaymentRequest;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static java.lang.Long.sum;
 
 @Service
 public class LoanPaymentServiceImpl implements LoanPaymentService {

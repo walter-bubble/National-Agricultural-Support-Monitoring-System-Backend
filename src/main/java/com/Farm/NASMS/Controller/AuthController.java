@@ -1,7 +1,7 @@
 package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.Service.AuthService;
-import com.Farm.NASMS.User;
+import com.Farm.NASMS.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

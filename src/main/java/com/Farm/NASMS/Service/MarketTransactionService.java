@@ -1,8 +1,7 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.MarketTransaction;
+import com.Farm.NASMS.model.MarketTransaction;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

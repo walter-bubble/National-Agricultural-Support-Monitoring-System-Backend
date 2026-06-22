@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Repository;
 
-import com.Farm.NASMS.User;
+import com.Farm.NASMS.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

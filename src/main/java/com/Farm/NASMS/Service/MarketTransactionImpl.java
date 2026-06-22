@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.MarketTransaction;
+import com.Farm.NASMS.model.MarketTransaction;
 import com.Farm.NASMS.Repository.MarketTransactionRepository;
 import org.springframework.stereotype.Service;
 

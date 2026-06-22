@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Farmer;
+import com.Farm.NASMS.model.Farmer;
 
 import java.util.List;
 

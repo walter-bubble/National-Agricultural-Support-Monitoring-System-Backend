@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Loan;
+import com.Farm.NASMS.model.Loan;
 
 import java.util.List;
 

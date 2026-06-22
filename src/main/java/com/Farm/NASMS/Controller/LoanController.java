@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.Loan;
+import com.Farm.NASMS.model.Loan;
 import com.Farm.NASMS.Service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

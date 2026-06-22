@@ -1,11 +1,14 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.*;
+import com.Farm.NASMS.enums.LoanStatus;
+import com.Farm.NASMS.model.Farmer;
+import com.Farm.NASMS.model.FarmingSeason;
+import com.Farm.NASMS.model.Loan;
+import com.Farm.NASMS.model.LoanPackage;
 import com.Farm.NASMS.Repository.FarmerRepository;
 import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,7 +27,7 @@ public class LoanServiceImpl implements LoanService {
         this.farmingSeasonRepository=farmingSeasonRepository;
     }
     @Override
-    public Loan createLoanFromPackage(Long nationalId, Long id,Long seasonId) {
+    public Loan createLoanFromPackage(Long nationalId, Long id, Long seasonId) {
         Farmer farmer = farmerRepository.findByNationalId(nationalId)
                 .orElseThrow(()->new RuntimeException("Farmer not found"));
         FarmingSeason season= farmingSeasonRepository.findById(seasonId)
@@ -48,11 +51,10 @@ public class LoanServiceImpl implements LoanService {
             throw new RuntimeException("season budget exceeded!");
         }
         //check if farmer has a lona already
-        boolean exists = loanRepository.existsByFarmerAndFarmingSeason(farmer,season);
-        if(exists){
-            throw new RuntimeException("Farmer already has a loan in this season");
+        boolean hasActiveLoan = loanRepository.existsByFarmerAndStatusIn(farmer,List.of(LoanStatus.ACTIVE,LoanStatus.PENDING));
+        if(hasActiveLoan){
+            throw new RuntimeException("You already have a loan!");
         }
-
         Loan loan = new Loan();
         loan.setFarmer(farmer);
         loan.setFarmingSeason(season);

@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.MarketListing;
+import com.Farm.NASMS.model.MarketListing;
 import com.Farm.NASMS.Service.MarketListingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

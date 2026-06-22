@@ -1,7 +1,7 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.Product;
-import com.Farm.NASMS.ProductRequest;
+import com.Farm.NASMS.model.Product;
+import com.Farm.NASMS.model.ProductRequest;
 import com.Farm.NASMS.Service.ProductService;
 import org.springframework.web.bind.annotation.*;
 

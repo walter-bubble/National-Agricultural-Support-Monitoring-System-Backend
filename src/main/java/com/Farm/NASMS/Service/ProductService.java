@@ -1,7 +1,7 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Product;
-import com.Farm.NASMS.ProductRequest;
+import com.Farm.NASMS.model.Product;
+import com.Farm.NASMS.model.ProductRequest;
 
 import java.util.List;
 

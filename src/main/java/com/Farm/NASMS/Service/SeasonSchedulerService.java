@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.FarmingSeason;
+import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

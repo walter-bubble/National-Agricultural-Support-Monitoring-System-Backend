@@ -1,7 +1,6 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.model;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity

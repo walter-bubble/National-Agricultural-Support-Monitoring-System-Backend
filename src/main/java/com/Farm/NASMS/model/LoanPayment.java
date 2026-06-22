@@ -1,11 +1,10 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.model;
 
+import com.Farm.NASMS.enums.PaymentMethod;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
-import org.hibernate.annotations.AnyDiscriminatorImplicitValues;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 public class LoanPayment {

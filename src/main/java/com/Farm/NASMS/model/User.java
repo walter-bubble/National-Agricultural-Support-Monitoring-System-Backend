@@ -1,10 +1,7 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import org.jspecify.annotations.Nullable;
-
-import javax.annotation.processing.Generated;
 
 @Entity
 @Table(name="users", uniqueConstraints={@UniqueConstraint(columnNames = "user_name")})

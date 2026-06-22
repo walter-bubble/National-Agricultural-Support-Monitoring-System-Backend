@@ -1,7 +1,5 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.LoanPayment;
-import com.Farm.NASMS.PaymentMethod;
 import com.Farm.NASMS.Service.LoanPaymentService;
 import com.Farm.NASMS.dto.LoanPaymentRequest;
 import com.Farm.NASMS.dto.LoanPaymentResponse;

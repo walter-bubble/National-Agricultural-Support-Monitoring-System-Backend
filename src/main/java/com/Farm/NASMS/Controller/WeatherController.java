@@ -1,7 +1,7 @@
 package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.Service.WeatherService;
-import com.Farm.NASMS.WeatherResponse;
+import com.Farm.NASMS.dto.WeatherResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

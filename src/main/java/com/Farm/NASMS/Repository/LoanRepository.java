@@ -1,18 +1,18 @@
 package com.Farm.NASMS.Repository;
 
-import com.Farm.NASMS.Farmer;
-import com.Farm.NASMS.FarmingSeason;
-import com.Farm.NASMS.Loan;
+import com.Farm.NASMS.model.Farmer;
+import com.Farm.NASMS.model.FarmingSeason;
+import com.Farm.NASMS.model.Loan;
+import com.Farm.NASMS.enums.LoanStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LoanRepository  extends JpaRepository<Loan, Long> {
     List<Loan> findByFarmerNationalIdAndStatus(Long nationalId,String status);
-
+    boolean existsByFarmerAndStatusIn(Farmer farmer, List<LoanStatus>statuses);
     @Query("SELECT COUNT(1) FROM Loan l WHERE l.farmingSeason.id=:seasonId")
     Long countLoansBySeason(@Param("seasonId")Long seasonId);
 

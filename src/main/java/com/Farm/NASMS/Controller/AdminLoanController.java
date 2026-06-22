@@ -1,9 +1,7 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.Loan;
-import com.Farm.NASMS.Service.LoanPaymentServiceImpl;
+import com.Farm.NASMS.model.Loan;
 import com.Farm.NASMS.Service.LoanService;
-import com.Farm.NASMS.Service.LoanServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,7 @@ public class AdminLoanController {
     public AdminLoanController(LoanService loanService){
         this.loanService=loanService;
     }
-    @PutMapping("/{loanId}/review")
+    @PutMapping("/{id}/review")
     public ResponseEntity<Loan> reviewLoan(@PathVariable Long id,@RequestParam boolean approved){
         String status = approved  ? "APPROVED" : "REJECTED";
         Loan updateLoan = loanService.updateLoanStatus(id,status);

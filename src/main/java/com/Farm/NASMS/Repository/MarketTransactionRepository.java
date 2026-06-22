@@ -1,6 +1,6 @@
 package com.Farm.NASMS.Repository;
 
-import com.Farm.NASMS.MarketTransaction;
+import com.Farm.NASMS.model.MarketTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

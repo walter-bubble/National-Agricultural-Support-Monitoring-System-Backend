@@ -1,5 +1,6 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.model;
 
+import com.Farm.NASMS.enums.FarmingType;
 import jakarta.persistence.*;
 
 @Entity

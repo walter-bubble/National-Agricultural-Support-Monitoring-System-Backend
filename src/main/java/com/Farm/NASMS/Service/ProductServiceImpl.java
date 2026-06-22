@@ -1,8 +1,8 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Farmer;
-import com.Farm.NASMS.Product;
-import com.Farm.NASMS.ProductRequest;
+import com.Farm.NASMS.model.Farmer;
+import com.Farm.NASMS.model.Product;
+import com.Farm.NASMS.model.ProductRequest;
 import com.Farm.NASMS.Repository.FarmerRepository;
 import com.Farm.NASMS.Repository.ProductRepository;
 import org.springframework.beans.BeanUtils;

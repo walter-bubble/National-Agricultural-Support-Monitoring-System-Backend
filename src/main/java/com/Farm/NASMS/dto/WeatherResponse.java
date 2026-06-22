@@ -1,7 +1,6 @@
-package com.Farm.NASMS;
+package com.Farm.NASMS.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.tools.javac.Main;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherResponse {
