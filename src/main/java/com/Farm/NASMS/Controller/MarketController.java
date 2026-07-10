@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/market")
 public class MarketController {
-    private MarketTransactionService marketTransactionService;
+    private final MarketTransactionService marketTransactionService;
     public MarketController(MarketTransactionService marketTransactionService){
         this.marketTransactionService=marketTransactionService;
     }
@@ -35,24 +35,24 @@ public class MarketController {
         List<MarketTransaction> list = marketTransactionService.getTransactionByBuyerId(buyerId);
         return ResponseEntity.ok(list);
     }
-    @PutMapping("/transaction/{productCode}")
-    public ResponseEntity<MarketTransaction> updateTransaction(@PathVariable String productCode, @RequestBody MarketTransaction transaction){
-        return marketTransactionService.getTransactionByProductCode(productCode)
+    @PutMapping("/transaction/{id}")
+    public ResponseEntity<MarketTransaction> updateTransaction(@PathVariable Long id, @RequestBody MarketTransaction transaction){
+        return marketTransactionService.getTransactionById(id)
                 .map(existing ->{
                     existing.setSellerId(transaction.getSellerId());
                     existing.setSellerType(transaction.getSellerType());
                     existing.setBuyerId(transaction.getBuyerId());
                     existing.setPrice(transaction.getPrice());
-                    existing.setQuantity(transaction.getQuantity());
+                    existing.setQuantityRequested(transaction.getQuantityRequested());
                     existing.setProductCode(transaction.getProductCode());
                     existing.setProductName(transaction.getProductName());
                     MarketTransaction updated = marketTransactionService.updateTransaction(existing);
                             return ResponseEntity.ok(updated);
                 }).orElse(ResponseEntity.notFound().build());
     }
-    @DeleteMapping("/transaction/{productCode}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable String productCode){
-        marketTransactionService.deleteTransaction(productCode);
+    @DeleteMapping("/transaction/{id}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id){
+        marketTransactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
 }

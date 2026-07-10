@@ -33,5 +33,4 @@ public class AnalyticsController {
     public ResponseEntity<List<SeasonGraphDto>> getGraphData(){
         return ResponseEntity.ok(analyticsService.getAllSeasonAnalytics());
     }
-
 }

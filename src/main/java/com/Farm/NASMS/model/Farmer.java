@@ -1,7 +1,9 @@
 package com.Farm.NASMS.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name="farmers", uniqueConstraints = @UniqueConstraint(columnNames = "nationalId"))
 public class Farmer {
@@ -23,87 +25,4 @@ public class Farmer {
     private double farmSize;
     private String titleNumber;
     private String county;
-    private String subCounty;
-    private String ward;
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getNationalId() {
-        return nationalId;
-    }
-
-    public void setNationalId(Long nationalId) {
-        this.nationalId = nationalId;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public double getFarmSize() {
-        return farmSize;
-    }
-
-    public void setFarmSize(double farmSize) {
-        this.farmSize = farmSize;
-    }
-
-    public String getTitleNumber() {
-        return titleNumber;
-    }
-
-    public void setTitleNumber(String titleNumber) {
-        this.titleNumber = titleNumber;
-    }
-
-    public String getCounty() {
-        return county;
-    }
-
-    public void setCounty(String county) {
-        this.county = county;
-    }
-
-    public String getSubCounty() {
-        return subCounty;
-    }
-
-    public void setSubCounty(String subCounty) {
-        this.subCounty = subCounty;
-    }
-
-    public String getWard() {
-        return ward;
-    }
-
-    public void setWard(String ward) {
-        this.ward = ward;
-    }
-
-
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Service
 public class FarmerServiceImpl implements FarmerService {
-    private FarmerRepository farmerRepository;
+    private final FarmerRepository farmerRepository;
     public FarmerServiceImpl(FarmerRepository farmerRepository){
         this.farmerRepository=farmerRepository;
     }

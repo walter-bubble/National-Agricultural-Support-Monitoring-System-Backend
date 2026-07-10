@@ -1,10 +1,10 @@
 package com.Farm.NASMS.Service;
 
+import com.Farm.NASMS.Repository.ProductRepo;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.model.Product;
 import com.Farm.NASMS.model.ProductRequest;
 import com.Farm.NASMS.Repository.FarmerRepository;
-import com.Farm.NASMS.Repository.ProductRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +12,15 @@ import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    private ProductRepository productRepository;
+    private ProductRepo productRepo;
     private FarmerRepository farmerRepository;
-    public ProductServiceImpl(ProductRepository productRepository,FarmerRepository farmerRepository){
-        this.productRepository = productRepository;
+    public ProductServiceImpl(ProductRepo productRepo,FarmerRepository farmerRepository){
+        this.productRepo = productRepo;
         this.farmerRepository = farmerRepository;
     }
     @Override
     public List<Product> getAllProduct() {
-        return productRepository.findAll();
+        return productRepo.findAll();
     }
 
     @Override
@@ -29,15 +29,15 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(()-> new RuntimeException("Farmer not found!"));
         Product product = new Product();
         product.setName(request.getName());
-        product.setQuantityUnit(request.getQuantityUnit());
-        product.setUnitPrice_ksh(request.getUnit_Price_ksh());
+        product.setQuantityUnit(request.getQuantityRequested());
+        product.setUnitPrice_ksh(request.getTotalInvoice());
         product.setFarmer(farmer);
-        return productRepository.save(product);
+        return productRepo.save(product);
     }
 
     @Override
     public Product updateProductById(Long id,ProductRequest request) {
-        Product existingProduct = productRepository.findById(id)
+        Product existingProduct = productRepo.findById(id)
                 .orElseThrow(()->new RuntimeException("Product not found"));
         /*existingProduct.setAgroforestryProduct(product.getAgroforestryProduct());
         existingProduct.setAquacultureProduct(product.getAquacultureProduct());
@@ -49,14 +49,14 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setProductStatus(product.getProductStatus());*/
         BeanUtils.copyProperties(request, existingProduct, "id", "farmer", "createdAt", "updatedAt");
 
-        return productRepository.save(existingProduct);
+        return productRepo.save(existingProduct);
     }
 
     @Override
     public void deleteProduct(Long id) {
-       if(!productRepository.existsById(id)){
+       if(!productRepo.existsById(id)){
            throw new RuntimeException("Product not found");
        }
-       productRepository.deleteById(id);
+       productRepo.deleteById(id);
     }
 }

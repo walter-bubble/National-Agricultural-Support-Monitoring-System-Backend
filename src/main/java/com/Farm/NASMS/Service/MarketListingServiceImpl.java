@@ -24,18 +24,18 @@ public class MarketListingServiceImpl implements MarketListingService{
     }
 
     @Override
-    public Optional<MarketListing> getProductByCode(String productCode) {
-        return marketListingRepository.findByProductCode(productCode);
+    public Optional<MarketListing> getProductById(Long id) {
+        return marketListingRepository.findById(id);
     }
 
     @Override
-    public MarketListing getProductBySellerId(Long sellerId) {
-        return (MarketListing) marketListingRepository.findBySellerId(sellerId);
+    public List<MarketListing> getProductBySellerId(Long sellerId) {
+        return marketListingRepository.findBySellerId(sellerId);
     }
 
     @Override
-    public MarketListing getProductByName(String productName) {
-        return (MarketListing) marketListingRepository.findByProductName(productName);
+    public List<MarketListing> getProductByName(String productName) {
+        return marketListingRepository.findByProductName(productName);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class MarketListingServiceImpl implements MarketListingService{
     }
 
     @Override
-    public void deleteListing(String productCode) {
-        marketListingRepository.deleteByProductCode(productCode);
+    public void deleteListing(Long id) {
+        marketListingRepository.deleteById(id);
 
     }
 }

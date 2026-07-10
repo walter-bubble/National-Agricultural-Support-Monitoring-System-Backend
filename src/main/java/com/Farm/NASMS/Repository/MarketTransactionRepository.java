@@ -13,9 +13,7 @@ import java.util.Optional;
 public interface MarketTransactionRepository extends JpaRepository<MarketTransaction, Long> {
     List<MarketTransaction>findBySellerId(Long sellerId);
     List<MarketTransaction>findByBuyerId(Long buyerId);
-    Optional<MarketTransaction> findByProductCode(String productCode);
-    void deleteByProductCode(String productCode);
-
-    @Query("SELECT SUM(m.quantity* m.price) FROM MarketTransaction m WHERE m.season.Id= :seasonId")
+    Optional<MarketTransaction> findById(Long id);
+    void deleteById(Long id);
     double getTotalSalesBySeason(@Param("seasonId") Long seasonId);
 }

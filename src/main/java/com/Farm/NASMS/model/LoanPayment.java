@@ -3,9 +3,10 @@ package com.Farm.NASMS.model;
 import com.Farm.NASMS.enums.PaymentMethod;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
+@Data
 @Entity
 public class LoanPayment {
 
@@ -37,76 +38,5 @@ public class LoanPayment {
     @PrePersist
     protected void onCreate(){
         paymentDate=LocalDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(LocalDateTime paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-    public String getTransactionCode() {
-        return transactionCode;
-    }
-
-    public void setTransactionCode(String transactionCode) {
-        this.transactionCode = transactionCode;
-    }
-
-    public Loan getLoan() {
-        return loan;
-    }
-
-    public void setLoan(Loan loan) {
-        this.loan = loan;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public double getRemainingBalance() {
-        return remainingBalance;
-    }
-
-    public void setRemainingBalance(double remainingBalance) {
-        this.remainingBalance = remainingBalance;
-    }
-
-    public double getAmountToPay() {
-        return amountToPay;
-    }
-
-    public void setAmountToPay(double amountToPay) {
-        this.amountToPay = amountToPay;
-    }
-
-    public double getTotalAmountPaid() {
-        return TotalAmountPaid;
-    }
-
-    public double getPreviousTotal() {
-        return previousTotal;
-    }
-
-    public void setPreviousTotal(double previousTotal) {
-        this.previousTotal = previousTotal;
-    }
-
-    public void setTotalAmountPaid(double totalAmountPaid) {
-        TotalAmountPaid = totalAmountPaid;
     }
 }

@@ -9,10 +9,10 @@ public interface MarketListingService {
     MarketListing createList(MarketListing listing);
     List<MarketListing> getAllListing();
 
-    Optional<MarketListing> getProductByCode(String productCode);
-    MarketListing getProductBySellerId(Long sellerId);
-    MarketListing getProductByName(String productName);
+    Optional<MarketListing> getProductById(Long id);
+    List<MarketListing> getProductBySellerId(Long sellerId);
+    List<MarketListing> getProductByName(String productName);
     MarketListing updateProductList(MarketListing listing);
-    void deleteListing(String productCode);
+    void deleteListing(Long id);
 }
 

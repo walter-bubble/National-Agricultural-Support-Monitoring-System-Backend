@@ -51,7 +51,7 @@ public class LoanServiceImpl implements LoanService {
             throw new RuntimeException("season budget exceeded!");
         }
         //check if farmer has a lona already
-        boolean hasActiveLoan = loanRepository.existsByFarmerAndStatusIn(farmer,List.of(LoanStatus.ACTIVE,LoanStatus.PENDING));
+        boolean hasActiveLoan = loanRepository.existsByFarmerAndStatusIn(farmer,List.of(LoanStatus.ACTIVE));
         if(hasActiveLoan){
             throw new RuntimeException("You already have a loan!");
         }
@@ -75,7 +75,8 @@ public class LoanServiceImpl implements LoanService {
         double interest = loanPackage.getAmount() * (loanPackage.getInterestRate()/100) * time;
         double totalPayment = loanPackage.getAmount() + interest;
         loan.setTotalPayment(totalPayment);
-        loan.setStatus(LoanStatus.PENDING);
+        loan.setStatus(LoanStatus.ACTIVE);
+        Loan savedLoan = loanRepository.save(loan);
         return loanRepository.save(loan);
     }
     @Override
@@ -98,7 +99,7 @@ public class LoanServiceImpl implements LoanService {
         loan.setDueDate(dueDate);
         double totalDue = loan.calculateTotalDue(dueDate);
         loan.setTotalPayment(totalDue);
-        loan.setStatus(LoanStatus.PENDING);
+        loan.setStatus(LoanStatus.ACTIVE);
         return loanRepository.save(loan);
     }
     @Override

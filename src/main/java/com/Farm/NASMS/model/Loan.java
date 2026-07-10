@@ -2,11 +2,12 @@ package com.Farm.NASMS.model;
 
 import com.Farm.NASMS.enums.LoanStatus;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
+@Data
 @Entity
 public class Loan {
     @Id
@@ -79,7 +80,7 @@ public class Loan {
         LocalDateTime now = LocalDateTime.now();
         loan.setIssuedDate(now);
         loan.setDueDate(now.plusMonths(loanPackage.getDurationMonths()));
-        loan.setStatus(LoanStatus.PENDING);
+        loan.setStatus(LoanStatus.ACTIVE);
         return loan;
     }
     private static double calculateTotalPayment(Loan loan){
@@ -103,127 +104,4 @@ public class Loan {
     public boolean isOverDue(){
         return LocalDateTime.now().isAfter(dueDate) && getRemainingBalance()>0;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Farmer getFarmer() {
-        return farmer;
-    }
-
-    public void setFarmer(Farmer farmer) {
-        this.farmer = farmer;
-    }
-
-    public LoanPackage getLoanPackage() {
-        return loanPackage;
-    }
-
-    public void setLoanPackage(LoanPackage loanPackage) {
-        this.loanPackage = loanPackage;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public double getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(double interestRate) {
-        this.interestRate = interestRate;
-    }
-
-    public double getMonthlyPenalty() {
-        return monthlyPenalty;
-    }
-
-    public void setMonthlyPenalty(double monthlyPenalty) {
-        this.monthlyPenalty = monthlyPenalty;
-    }
-    public int getDurationMonths() {
-        return durationMonths;
-    }
-
-    public void setDurationMonths(int durationMonths) {
-        this.durationMonths = durationMonths;
-    }
-
-    public LocalDateTime getIssuedDate() {
-        return issuedDate;
-    }
-
-    public void setIssuedDate(LocalDateTime issuedDate) {
-        this.issuedDate = issuedDate;
-    }
-
-    public LocalDateTime getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDateTime dueDate) {
-        this.dueDate = dueDate;
-    }
-    public double getTotalPayment() {
-        return totalPayment;
-    }
-
-    public void setTotalPayment(double totalPayment) {
-        this.totalPayment = totalPayment;
-    }
-
-    public FarmingSeason getFarmingSeason() {
-        return farmingSeason;
-    }
-
-    public void setFarmingSeason(FarmingSeason farmingSeason) {
-        this.farmingSeason = farmingSeason;
-    }
-
-    public List<LoanPayment> getLoanPayments() {
-        return loanPayments;
-    }
-
-    public void setLoanPayments(List<LoanPayment> loanPayments) {
-        this.loanPayments = loanPayments;
-    }
-
-    public LoanStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(LoanStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setRemainingBalance(double remainingBalance) {
-        this.remainingBalance = remainingBalance;
-    }
-
 }

@@ -35,8 +35,8 @@ public class MarketTransactionImpl implements MarketTransactionService{
     }
 
     @Override
-    public Optional<MarketTransaction> getTransactionByProductCode(String productCode) {
-        return marketTransactionRepository.findByProductCode(productCode);
+    public Optional<MarketTransaction> getTransactionById(Long id) {
+        return marketTransactionRepository.findById(id);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class MarketTransactionImpl implements MarketTransactionService{
     }
 
     @Override
-    public void deleteTransaction(String productCode) {
-        marketTransactionRepository.deleteByProductCode(productCode);
+    public void deleteTransaction(Long id) {
+        marketTransactionRepository.deleteById(id);
 
     }
 }

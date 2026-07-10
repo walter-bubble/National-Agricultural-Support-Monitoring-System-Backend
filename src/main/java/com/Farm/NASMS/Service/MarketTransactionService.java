@@ -10,7 +10,7 @@ MarketTransaction createTransaction(MarketTransaction transaction);
 List <MarketTransaction>  getAllTransactions();
 List<MarketTransaction> getTransactionBySellerId(Long sellerId);
 List<MarketTransaction> getTransactionByBuyerId(Long buyerId);
-Optional<MarketTransaction> getTransactionByProductCode(String productCode);
+Optional<MarketTransaction> getTransactionById(Long id);
 MarketTransaction updateTransaction(MarketTransaction marketTransaction);
-void deleteTransaction(String productCode);
+void deleteTransaction(Long id);
 }

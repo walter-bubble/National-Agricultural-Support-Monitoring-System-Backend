@@ -27,16 +27,16 @@ public class MarketListingController {
         return ResponseEntity.ok(marketListingService.getProductByCode(productCode));
     }*/
     @GetMapping("/seller/{sellerId}")
-    public ResponseEntity<MarketListing> getProductBySellerId(@PathVariable Long sellerId){
+    public ResponseEntity<List<MarketListing>> getProductBySellerId(@PathVariable Long sellerId){
         return ResponseEntity.ok(marketListingService.getProductBySellerId(sellerId));
     }
     @GetMapping("/product/{productName}")
-    public ResponseEntity<MarketListing> getProductByName(@PathVariable String productName){
+    public ResponseEntity<List<MarketListing>> getProductByName(@PathVariable String productName){
         return ResponseEntity.ok(marketListingService.getProductByName(productName));
     }
-    @PutMapping("/{productCode}")
-    public ResponseEntity<MarketListing> updateProductList(@PathVariable String productCode, MarketListing listing){
-        return marketListingService.getProductByCode(productCode).map(existing->{
+    @PutMapping("/{id}")
+    public ResponseEntity<MarketListing> updateProductList(@PathVariable Long id,@RequestBody MarketListing listing){
+        return marketListingService.getProductById(id).map(existing->{
             existing.setProductName(listing.getProductName());
             existing.setProductCode(listing.getProductCode());
             existing.setQuantity(listing.getQuantity());
@@ -45,9 +45,12 @@ public class MarketListingController {
             return ResponseEntity.ok(updated);
         }).orElse(ResponseEntity.notFound().build());
     }
-    @DeleteMapping("/productCode")
-    public ResponseEntity<Void> deleteListing(@PathVariable String productCode){
-        marketListingService.deleteListing(productCode);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteListing(@PathVariable Long id){
+        if (marketListingService.getProductById(id).isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        marketListingService.deleteListing(id);
         return ResponseEntity.noContent().build();
     }
 }
