@@ -11,7 +11,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/loans")
 public class LoanController {
-    @Autowired
     private final LoanService loanService;
 
     public LoanController(LoanService loanService) {
@@ -34,7 +33,7 @@ public class LoanController {
         return loanService.getLoansById(id);
         }
         //get the loan
-    @GetMapping("/farmer/national{NationalId}")
+    @GetMapping("/farmer/{nationalId}")
     public List<Loan> getLoansByFarmerNationalId(@PathVariable Long nationalId,
                                                  @RequestParam(required = false)
                                                  String status) {

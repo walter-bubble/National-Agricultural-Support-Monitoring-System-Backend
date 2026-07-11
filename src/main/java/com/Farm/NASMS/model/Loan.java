@@ -23,7 +23,7 @@ public class Loan {
     private FarmingSeason farmingSeason;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="loan_id")
+    @JoinColumn(name="loan_package_id")
     private LoanPackage loanPackage;
 
     @OneToMany(mappedBy = "loan",cascade = CascadeType.ALL,orphanRemoval = true)

@@ -31,7 +31,12 @@ public class FarmerServiceImpl implements FarmerService {
     }
     @Override
     public Farmer updateFarmer(Long id, Farmer farmer) {
-        return farmerRepository.save(farmer);
+        Farmer existingFarmer = getFarmerById(id);
+        existingFarmer.setEmail(farmer.getEmail());
+        existingFarmer.setCounty(farmer.getCounty());
+        existingFarmer.setFarmSize(farmer.getFarmSize());
+        existingFarmer.setPhoneNumber(farmer.getPhoneNumber());
+        return farmerRepository.save(existingFarmer);
     }
     @Override
     public void deleteFarmer(Long id) {

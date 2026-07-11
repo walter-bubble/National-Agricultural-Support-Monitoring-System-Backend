@@ -29,7 +29,7 @@ public LoanPackageController(LoanPackageService loanPackageService){
   public LoanPackage updateLoanPackage(@PathVariable Long id,@RequestBody LoanPackage loanPackage){
     return loanPackageService.updateLoanPackage(id,loanPackage);
   }
-    @DeleteMapping("/{loanCode}")
+    @DeleteMapping("/{id}")
     public void deleteLoanPackage(@PathVariable Long id){
     loanPackageService.deleteLoanPackage(id);
   }

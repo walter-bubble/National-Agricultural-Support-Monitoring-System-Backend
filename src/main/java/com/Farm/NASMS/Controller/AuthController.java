@@ -1,6 +1,8 @@
 package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.Service.AuthService;
+import com.Farm.NASMS.dto.FarmerRegistrationRequest;
+import com.Farm.NASMS.dto.LoginRequest;
 import com.Farm.NASMS.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,9 @@ public class AuthController {
     }
     //register
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody FarmerRegistrationRequest request){
         try{
-        User savedUser=authService.register(user);
+        User savedUser=authService.register(request);
         return ResponseEntity.ok(savedUser);
         }
     catch(RuntimeException e){
@@ -31,9 +33,9 @@ public class AuthController {
     }
     //login
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user){
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest LgRequest){
         try {
-            String token = authService.login(user.getEmailAddress(), user.getPassword());
+            String token = authService.login(LgRequest.getEmailAddress(), LgRequest.getPassword());
             return ResponseEntity.ok(token);
         }
         catch(RuntimeException e){
