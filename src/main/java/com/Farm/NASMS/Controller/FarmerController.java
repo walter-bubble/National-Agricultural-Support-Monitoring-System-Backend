@@ -25,10 +25,6 @@ public class FarmerController {
     public Farmer getFarmerByNationalId(@PathVariable Long nationalId){
         return farmerService.getFarmerByNationalId(nationalId);
     }
-    @PostMapping
-    public Farmer addFarmer(@RequestBody Farmer farmer){
-        return farmerService.addFarmer(farmer);
-    }
     @PutMapping("/{id}")
     public Farmer updateFarmer(@PathVariable Long id, @RequestBody Farmer farmer){
         return farmerService.updateFarmer(id,farmer);

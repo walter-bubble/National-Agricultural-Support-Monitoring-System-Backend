@@ -10,11 +10,12 @@ public class LoanPackage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long loanId;
     private double amount;
     private double interestRate;
     private int durationMonths;
     private double monthlyPenalty;
+    private double minimumFarmSize;
+    private double maximumFarmSize;
     private String description;
 
     @ManyToOne

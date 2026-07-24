@@ -13,7 +13,7 @@ public class LoanPaymentController {
     public LoanPaymentController(LoanPaymentService loanPaymentService){
         this.loanPaymentService=loanPaymentService;
     }
-    @PostMapping("/{loanCode}")
+    @PostMapping("/{id}")
     public ResponseEntity<LoanPaymentResponse> payLoan(@PathVariable Long id, @RequestBody LoanPaymentRequest request){
         LoanPaymentResponse loanPayment = loanPaymentService.makePayment(id,request);
         return ResponseEntity.ok(loanPayment);

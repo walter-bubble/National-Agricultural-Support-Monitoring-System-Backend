@@ -1,7 +1,9 @@
 package com.Farm.NASMS.Service;
 
+import com.Farm.NASMS.Repository.UserRepository;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.Repository.FarmerRepository;
+import com.Farm.NASMS.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,8 +11,10 @@ import java.util.List;
 @Service
 public class FarmerServiceImpl implements FarmerService {
     private final FarmerRepository farmerRepository;
-    public FarmerServiceImpl(FarmerRepository farmerRepository){
+    private final UserRepository userRepository;
+    public FarmerServiceImpl(FarmerRepository farmerRepository,UserRepository userRepository){
         this.farmerRepository=farmerRepository;
+        this.userRepository=userRepository;
     }
     @Override
     public List<Farmer> getAllFarmers() {
@@ -24,10 +28,6 @@ public class FarmerServiceImpl implements FarmerService {
     public Farmer getFarmerByNationalId(Long nationalId) {
         return farmerRepository.findByNationalId(nationalId)
                 .orElseThrow(()-> new RuntimeException("Farmer not found!"));
-    }
-    @Override
-    public Farmer addFarmer(Farmer farmer) {
-        return farmerRepository.save(farmer);
     }
     @Override
     public Farmer updateFarmer(Long id, Farmer farmer) {

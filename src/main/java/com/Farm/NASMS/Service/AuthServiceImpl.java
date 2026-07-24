@@ -2,6 +2,7 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.Repository.FarmerRepository;
 import com.Farm.NASMS.dto.FarmerRegistrationRequest;
+import com.Farm.NASMS.dto.UserResponse;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.security.JwtUtil;
 import com.Farm.NASMS.model.User;
@@ -26,14 +27,17 @@ public class AuthServiceImpl implements AuthService {
     }
     @Override
     @Transactional
-    public User register(FarmerRegistrationRequest request) {
+    public UserResponse register(FarmerRegistrationRequest request) {
         //check email
         if(userRepository.findByEmailAddress(request.getEmailAddress()).isPresent()){
              throw new RuntimeException("user exists");
         }
+        if(userRepository.findByUserName(request.getName()).isPresent()){
+            throw new RuntimeException("username exists");
+        }
         //check nationalId
         User user = new User();
-        user.setUserName(request.getEmailAddress());
+        user.setUserName(request.getUserName());
         user.setEmailAddress(request.getEmailAddress());
         // encode password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -47,13 +51,20 @@ public class AuthServiceImpl implements AuthService {
         farmer.setFarmSize(request.getFarmSize());
         farmer.setTitleNumber(request.getTitleNumber());
         farmer.setFarmSize(request.getFarmSize());
+        farmer.setNationalId(request.getNationalId());
         farmer.setName(request.getName());
         farmer.setEmail(request.getEmailAddress());
-        farmer.setUser(user);
+        farmer.setUser(savedUser);
         farmerRepository.save(farmer);
 
-        savedUser.setPassword(null);
-        return savedUser;
+        UserResponse response = new UserResponse();
+        response.setId(savedUser.getId());
+        response.setUserName(savedUser.getUserName());
+        response.setRole(savedUser.getRole());
+        response.setEmailAddress(savedUser.getEmailAddress());
+
+        return response;
+
     }
 @Override
     public String login(String emailAddress, String password) {

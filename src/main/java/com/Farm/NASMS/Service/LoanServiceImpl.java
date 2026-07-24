@@ -20,7 +20,7 @@ public class LoanServiceImpl implements LoanService {
     private LoanRepository loanRepository;
     private LoanPackageRepository loanPackageRepository;
     private FarmingSeasonRepository farmingSeasonRepository;
-    public LoanServiceImpl(FarmerRepository farmerRepository, LoanRepository loanRepository,LoanPackageRepository loanPackageRepository,FarmingSeasonRepository farmingSeasonRepository){
+    public LoanServiceImpl(FarmerRepository farmerRepository, LoanRepository loanRepository, LoanPackageRepository loanPackageRepository, FarmingSeasonRepository farmingSeasonRepository){
         this.farmerRepository=farmerRepository;
         this.loanRepository=loanRepository;
         this.loanPackageRepository=loanPackageRepository;
@@ -77,7 +77,7 @@ public class LoanServiceImpl implements LoanService {
         loan.setTotalPayment(totalPayment);
         loan.setStatus(LoanStatus.ACTIVE);
         Loan savedLoan = loanRepository.save(loan);
-        return loanRepository.save(loan);
+        return savedLoan;
     }
     @Override
     public List<Loan> getAllLoans() {
@@ -90,7 +90,10 @@ public class LoanServiceImpl implements LoanService {
     }
     @Override
     public List<Loan> getLoansByFarmer(Long nationalId,String status) {
-        return loanRepository.findByFarmerNationalIdAndStatus(nationalId,status);
+        if(status==null){
+            return loanRepository.findByFarmerNationalId(nationalId);
+        }
+        return loanRepository.findByFarmerNationalIdAndStatus(nationalId,LoanStatus.valueOf(status.toUpperCase()));
     }
     @Override
     public Loan payLoan(Long id){

@@ -1,7 +1,7 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.model.LoanPackage;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
+import com.Farm.NASMS.model.LoanPackage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
