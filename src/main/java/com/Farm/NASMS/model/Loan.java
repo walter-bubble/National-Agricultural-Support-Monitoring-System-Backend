@@ -41,7 +41,6 @@ public class Loan {
 
     private double monthlyPenalty;
     private double totalPayment;
-    private LocalDateTime issuedDate;
     private LocalDateTime dueDate;
     private double remainingBalance;
 
@@ -55,9 +54,6 @@ public class Loan {
     @PrePersist
     protected void onCreate(){
         createdAt=LocalDateTime.now();
-        if(issuedDate==null){
-            issuedDate=LocalDateTime.now();
-        }
     }
     //business logic here
     public Loan(){}
@@ -72,7 +68,6 @@ public class Loan {
         loan.setTotalPayment(calculateTotalPayment(loan));
 
         LocalDateTime now = LocalDateTime.now();
-        loan.setIssuedDate(now);
         loan.setDueDate(now.plusMonths(loanPackage.getDurationMonths()));
         loan.setStatus(LoanStatus.ACTIVE);
         return loan;

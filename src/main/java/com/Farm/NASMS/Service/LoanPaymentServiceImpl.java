@@ -25,11 +25,9 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
     @Override
     @Transactional
     public LoanPaymentResponse makePayment(Long id, LoanPaymentRequest request) {
-        List<Loan> loans = loanRepository.findByLoanPackage_id(id);
-        if (loans.isEmpty()) {
-            throw new RuntimeException("loan does not exist");
-        }
-        Loan loan = loans.get(0);
+        Loan loan = loanRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("Loan does not exist"));
+
         double amount = request.getAmountToPay();
         PaymentMethod paymentMethod = request.getPaymentMethod();
         if (amount <= 0) {
@@ -45,7 +43,6 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
         payment.setLoan(loan);
         payment.setPaymentMethod(paymentMethod);
         payment.setAmountToPay(amount);
-        payment.setPaymentDate(LocalDateTime.now());
         //payment.setTransactionCode();
 
         double newBalance = loan.getRemainingBalance() - amount;
@@ -73,6 +70,7 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
         response.setPaymentDate(saved.getPaymentDate());
         response.setTransactionCode(saved.getTransactionCode());
         response.setPaymentMethod(saved.getPaymentMethod());
+        response.setLoanCode(saved.getLoan().toString());
 
         return response;
     }

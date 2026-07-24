@@ -67,7 +67,6 @@ public class LoanServiceImpl implements LoanService {
 
 
        LocalDateTime now = LocalDateTime.now();
-       loan.setIssuedDate(now);
        LocalDateTime dueDate = now
                .plusMonths(loan.getDurationMonths());
        loan.setDueDate(dueDate);
@@ -76,6 +75,7 @@ public class LoanServiceImpl implements LoanService {
         double interest = loanPackage.getAmount() * (loanPackage.getInterestRate()/100) * time;
         double totalPayment = loanPackage.getAmount() + interest;
         loan.setTotalPayment(totalPayment);
+        loan.setRemainingBalance(totalPayment);
         loan.setStatus(LoanStatus.ACTIVE);
         Loan savedLoan = loanRepository.save(loan);
 
@@ -90,7 +90,6 @@ public class LoanServiceImpl implements LoanService {
         response.setDueDate(savedLoan.getDueDate());
         response.setFarmerName(savedLoan.getFarmer().getName());
         response.setTotalPayment(savedLoan.getTotalPayment());
-        response.setIssuedDate(savedLoan.getIssuedDate());
         response.setSeasonName(savedLoan.getFarmingSeason().getSeasonName());
         response.setStatus(savedLoan.getStatus());
         response.setNationalId(savedLoan.getFarmer().getNationalId());

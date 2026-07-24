@@ -5,6 +5,7 @@ import com.Farm.NASMS.enums.PaymentMethod;
 public class LoanPaymentRequest {
     private double amountToPay;
     private PaymentMethod paymentMethod;
+    private String transactionCode;
 
     public double getAmountToPay() {
         return amountToPay;
@@ -20,5 +21,13 @@ public class LoanPaymentRequest {
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getTransactionCode() {
+        return transactionCode;
+    }
+
+    public void setTransactionCode(String transactionCode) {
+        this.transactionCode = transactionCode;
     }
 }

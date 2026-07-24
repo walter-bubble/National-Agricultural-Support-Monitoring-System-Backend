@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
         "interestRate",
         "totalPayment",
         "dueDate",
-        "status",
-        "issuedDate"
+        "status"
 })
 public class LoanResponse {
     private Long loanId;
@@ -25,7 +24,6 @@ public class LoanResponse {
     private double interestRate;
     private double totalPayment;
     private LoanStatus status;
-    private LocalDateTime issuedDate;
     private LocalDateTime dueDate;
 
     public Long getLoanId() {
@@ -82,14 +80,6 @@ public class LoanResponse {
 
     public void setStatus(LoanStatus status) {
         this.status = status;
-    }
-
-    public LocalDateTime getIssuedDate() {
-        return issuedDate;
-    }
-
-    public void setIssuedDate(LocalDateTime issuedDate) {
-        this.issuedDate = issuedDate;
     }
 
     public LocalDateTime getDueDate() {
