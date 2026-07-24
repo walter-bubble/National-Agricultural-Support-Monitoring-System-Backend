@@ -50,7 +50,6 @@ public class Loan {
 
     //Audit
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     //the life cycle
     @PrePersist
@@ -60,11 +59,6 @@ public class Loan {
             issuedDate=LocalDateTime.now();
         }
     }
-    @PreUpdate
-    protected void onUpdate(){
-        updatedAt=LocalDateTime.now();
-    }
-
     //business logic here
     public Loan(){}
     public static Loan createLoanFromPackage(Farmer farmer, LoanPackage loanPackage) {

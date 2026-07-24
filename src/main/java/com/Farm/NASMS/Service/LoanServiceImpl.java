@@ -1,5 +1,6 @@
 package com.Farm.NASMS.Service;
 
+import com.Farm.NASMS.dto.LoanResponse;
 import com.Farm.NASMS.enums.LoanStatus;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.model.FarmingSeason;
@@ -27,11 +28,11 @@ public class LoanServiceImpl implements LoanService {
         this.farmingSeasonRepository=farmingSeasonRepository;
     }
     @Override
-    public Loan createLoanFromPackage(Long nationalId, Long id, Long seasonId) {
+    public LoanResponse createLoanFromPackage(Long nationalId, Long id) {
         Farmer farmer = farmerRepository.findByNationalId(nationalId)
                 .orElseThrow(()->new RuntimeException("Farmer not found"));
-        FarmingSeason season= farmingSeasonRepository.findById(seasonId)
-                .orElseThrow(()->new RuntimeException("season not found!"));
+        FarmingSeason season = farmingSeasonRepository.findActiveSeason()
+                .orElseThrow(() -> new RuntimeException("No active season found!"));
         LoanPackage loanPackage=loanPackageRepository.findById(id)
                 .orElseThrow(()->new RuntimeException("loan package not found"));
 
@@ -77,8 +78,26 @@ public class LoanServiceImpl implements LoanService {
         loan.setTotalPayment(totalPayment);
         loan.setStatus(LoanStatus.ACTIVE);
         Loan savedLoan = loanRepository.save(loan);
-        return savedLoan;
+
+        LoanResponse response = getLoanResponse(savedLoan);
+        return response;
     }
+
+    private static LoanResponse getLoanResponse(Loan savedLoan) {
+        LoanResponse response = new LoanResponse();
+        response.setLoanId(savedLoan.getId());
+        response.setAmount(savedLoan.getAmount());
+        response.setDueDate(savedLoan.getDueDate());
+        response.setFarmerName(savedLoan.getFarmer().getName());
+        response.setTotalPayment(savedLoan.getTotalPayment());
+        response.setIssuedDate(savedLoan.getIssuedDate());
+        response.setSeasonName(savedLoan.getFarmingSeason().getSeasonName());
+        response.setStatus(savedLoan.getStatus());
+        response.setNationalId(savedLoan.getFarmer().getNationalId());
+        response.setInterestRate(savedLoan.getInterestRate());
+        return response;
+    }
+
     @Override
     public List<Loan> getAllLoans() {
         return loanRepository.findAll();

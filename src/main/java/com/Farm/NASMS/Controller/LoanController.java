@@ -1,5 +1,6 @@
 package com.Farm.NASMS.Controller;
 
+import com.Farm.NASMS.dto.LoanResponse;
 import com.Farm.NASMS.model.Loan;
 import com.Farm.NASMS.Service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,9 @@ public class LoanController {
         this.loanService = loanService;
     }
     //create loan
-    @PostMapping("/farmer/{nationalId}/package/{id}/season/{seasonId}")
-        public Loan createLoan(@PathVariable Long nationalId,@PathVariable Long id,
-                               @PathVariable Long seasonId){
-            return loanService.createLoanFromPackage(nationalId,id,seasonId);
+    @PostMapping("/{nationalId}/package/{id}")
+        public LoanResponse createLoan(@PathVariable Long nationalId, @PathVariable Long id){
+            return loanService.createLoanFromPackage(nationalId,id);
         }
         //get list of loans
         @GetMapping

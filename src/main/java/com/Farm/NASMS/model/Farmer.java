@@ -27,6 +27,9 @@ public class Farmer {
     private String email;
 
     private double farmSize;
+
+    @Column(unique = true)
     private String titleNumber;
+
     private String county;
 }

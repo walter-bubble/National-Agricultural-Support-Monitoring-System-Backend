@@ -12,7 +12,6 @@ public class MarketTransaction {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name="season_id",nullable = false)
     private FarmingSeason season;
 
     @ManyToOne

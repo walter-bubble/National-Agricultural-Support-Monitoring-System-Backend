@@ -15,5 +15,11 @@ public interface MarketTransactionRepository extends JpaRepository<MarketTransac
     List<MarketTransaction>findByBuyerId(Long buyerId);
     Optional<MarketTransaction> findById(Long id);
     void deleteById(Long id);
+    @Query("""
+    SELECT COALESCE(SUM(m.price * m.quantityRequested),0)
+    FROM MarketTransaction m
+    WHERE m.season.id = :seasonId
+""")
     double getTotalSalesBySeason(@Param("seasonId") Long seasonId);
+
 }

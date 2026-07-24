@@ -19,7 +19,6 @@ public class LoanPackage {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name="season_id")
     private FarmingSeason farmingSeason;
 
     public LoanPackage(){}
