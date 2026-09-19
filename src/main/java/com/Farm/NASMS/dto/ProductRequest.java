@@ -7,13 +7,11 @@ import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
-@Entity
+
 public class ProductRequest {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private double quantityRequested;
-    private double totalInvoice;
+    private double unitPrice;
     private Long farmerId;
 }
