@@ -3,6 +3,8 @@ package com.Farm.NASMS.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 public class LoanPackage {
@@ -10,10 +12,10 @@ public class LoanPackage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private double amount;
-    private double interestRate;
+    private BigDecimal amount;
+    private BigDecimal interestRate;
     private int durationMonths;
-    private double monthlyPenalty;
+    private BigDecimal monthlyPenalty;
     private double minimumFarmSize;
     private double maximumFarmSize;
     private String description;

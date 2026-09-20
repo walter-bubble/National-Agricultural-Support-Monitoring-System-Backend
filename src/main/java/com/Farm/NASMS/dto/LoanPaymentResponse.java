@@ -2,38 +2,39 @@ package com.Farm.NASMS.dto;
 
 import com.Farm.NASMS.enums.PaymentMethod;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class LoanPaymentResponse {
-    private double amountToPay;
-    private double remainingBalance;
-    private double totalAmountPaid;
+    private BigDecimal amountToPay;
+    private BigDecimal remainingBalance;
+    private BigDecimal totalAmountPaid;
     private PaymentMethod paymentMethod;
     private String transactionCode;
     private LocalDateTime paymentDate;
     private String loanCode;
 
-    public double getAmountToPay() {
+    public BigDecimal getAmountToPay() {
         return amountToPay;
     }
 
-    public void setAmountToPay(double amountToPay) {
+    public void setAmountToPay(BigDecimal amountToPay) {
         this.amountToPay = amountToPay;
     }
 
-    public double getRemainingBalance() {
+    public BigDecimal getRemainingBalance() {
         return remainingBalance;
     }
 
-    public void setRemainingBalance(double remainingBalance) {
+    public void setRemainingBalance(BigDecimal remainingBalance) {
         this.remainingBalance = remainingBalance;
     }
 
-    public double getTotalAmountPaid() {
+    public BigDecimal getTotalAmountPaid() {
         return totalAmountPaid;
     }
 
-    public void setTotalAmountPaid(double totalAmountPaid) {
+    public void setTotalAmountPaid(BigDecimal totalAmountPaid) {
         this.totalAmountPaid = totalAmountPaid;
     }
 

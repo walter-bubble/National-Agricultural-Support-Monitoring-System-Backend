@@ -2,7 +2,13 @@ package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.Service.FarmerService;
+
+import com.Farm.NASMS.security.AuthenticatedUserService;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 

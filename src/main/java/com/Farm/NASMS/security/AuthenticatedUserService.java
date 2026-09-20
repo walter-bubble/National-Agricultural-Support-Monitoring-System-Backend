@@ -1,0 +1,82 @@
+package com.Farm.NASMS.security;
+
+import com.Farm.NASMS.model.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+
+
+import com.Farm.NASMS.Repository.FarmerRepository;
+
+@Component
+public class AuthenticatedUserService {
+    private final FarmerRepository farmerRepository;
+    public AuthenticatedUserService(FarmerRepository farmerRepository){
+        this.farmerRepository = farmerRepository;
+    }
+    public User getCurrentUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null ||
+                !authentication.isAuthenticated() ||
+                !(authentication.getPrincipal() instanceof CustomUserDetails)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
+        }
+        return ((CustomUserDetails) authentication.getPrincipal()).user();
+    }
+    public Farmer getCurrentFarmer(){
+        User currentUser = getCurrentUser();
+        return farmerRepository.findByUserId(currentUser.getId())
+        .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Farmer not found"));
+    }
+    public boolean isAdmin(){
+        return "ADMIN".equalsIgnoreCase(getCurrentUser().getRole());
+    }
+    public boolean isFarmer(){
+        return "FARMER".equalsIgnoreCase(getCurrentUser().getRole());
+    }
+    public boolean isCurrentFarmer(Long farmerId){
+        return isAdmin() || (isFarmer() && getCurrentFarmer().getId().equals(farmerId));
+    }
+    public boolean isCurrentFarmerNationalId(Long nationalId){
+        return isAdmin() || (isFarmer() && getCurrentFarmer().getNationalId().equals(nationalId));
+    }
+    public boolean isLoanOwner(Loan loan){
+        if(isAdmin()){
+            return true;
+        }
+        return isFarmer() && loan.getFarmer() != null && loan.getFarmer().getId().equals(getCurrentFarmer().getId());
+    }
+     public boolean isListingOwner(MarketListing listing) {
+        if (isAdmin()) {
+            return true;
+        }
+        return isFarmer() && listing.getSellerId() != null && listing.getSellerId().equals(getCurrentFarmer().getId());
+    }
+
+    public boolean isTransactionOwner(MarketTransaction transaction) {
+        if (isAdmin()) {
+            return true;
+        }
+        Long currentFarmerId = getCurrentFarmer().getId();
+        return transaction != null && (currentFarmerId.equals(transaction.getBuyerId()) || currentFarmerId.equals(transaction.getSellerId()));
+    }
+
+    public boolean isCurrentBuyer(Long buyerId) {
+        return isAdmin() || (isFarmer() && getCurrentFarmer().getId().equals(buyerId));
+    }
+
+    public boolean isCurrentSeller(Long sellerId) {
+        return isAdmin() || (isFarmer() && getCurrentFarmer().getId().equals(sellerId));
+    }
+    public boolean isProductOwner(Product product) {
+        if (isAdmin()) {
+            return true;
+        }
+        return isFarmer()
+                && product != null
+                && product.getFarmer() != null
+                && product.getFarmer().getId().equals(getCurrentFarmer().getId());
+    }
+}

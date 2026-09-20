@@ -39,11 +39,26 @@ public class MarketTransaction {
         this.sellerName=sellerName;
         this.buyerName=buyerName;
         this.productName=productName;
-        this.quantityRequested=quantityRequested;
+        this.quantityRequested=quantity;
         this.price=price;
         this.productCode=productCode;
     }
 
-    public MarketTransaction(String sellerName, String sellerType, String productName, String productCode, String buyerName, double quantityRequested, double totalInvoiceCost) {
+    public MarketTransaction(
+            String sellerName,
+            String sellerType,
+            String productName,
+            String productCode,
+            String buyerName,
+            double quantityRequested,
+            double totalInvoiceCost) {
+
+        this.sellerName = sellerName;
+        this.sellerType = sellerType;
+        this.productName = productName;
+        this.productCode = productCode;
+        this.buyerName = buyerName;
+        this.quantityRequested = quantityRequested;
+        this.price = totalInvoiceCost;
     }
 }

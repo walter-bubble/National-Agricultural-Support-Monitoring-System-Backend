@@ -36,20 +36,10 @@ public class MarketListingController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<MarketListing> updateProductList(@PathVariable Long id,@RequestBody MarketListing listing){
-        return marketListingService.getProductById(id).map(existing->{
-            existing.setProductName(listing.getProductName());
-            existing.setProductCode(listing.getProductCode());
-            existing.setQuantity(listing.getQuantity());
-            existing.setPrice(listing.getPrice());
-            MarketListing updated=marketListingService.updateProductList(existing);
-            return ResponseEntity.ok(updated);
-        }).orElse(ResponseEntity.notFound().build());
+            return ResponseEntity.ok(marketListingService.updateProductList(id,listing));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteListing(@PathVariable Long id){
-        if (marketListingService.getProductById(id).isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
         marketListingService.deleteListing(id);
         return ResponseEntity.noContent().build();
     }

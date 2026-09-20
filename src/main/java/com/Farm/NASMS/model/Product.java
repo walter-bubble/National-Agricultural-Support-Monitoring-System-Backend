@@ -11,12 +11,14 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String productCode;
     private String name;
     private double quantityUnit;
     private double unitPrice_ksh;
 
     @ManyToOne
     private Farmer farmer;
+
 }
 
 

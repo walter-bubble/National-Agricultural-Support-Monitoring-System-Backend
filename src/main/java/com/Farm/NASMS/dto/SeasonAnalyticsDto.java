@@ -1,15 +1,17 @@
 package com.Farm.NASMS.dto;
 
+import java.math.BigDecimal;
+
 public class SeasonAnalyticsDto {
     private String seasonName;
     private Long totalFarmers;
     private Long totalLoans;
     private Long approvedLoans;
     private Long rejectedLoans;
-    private double totalSupportFunds;
-    private double totalSales;
-    private double totalLoanAmount;
-    private double remainingBudget;
+    private BigDecimal totalSupportFunds;
+    private BigDecimal totalSales;
+    private BigDecimal totalLoanAmount;
+    private BigDecimal remainingBudget;
     private double loanUtilizationRate;
 
     public SeasonAnalyticsDto(){
@@ -40,19 +42,19 @@ public class SeasonAnalyticsDto {
         this.totalLoans = totalLoans;
     }
 
-    public double getTotalSupportFunds() {
+    public BigDecimal getTotalSupportFunds() {
         return totalSupportFunds;
     }
 
-    public void setTotalSupportFunds(double totalSupportFunds) {
+    public void setTotalSupportFunds(BigDecimal totalSupportFunds) {
         this.totalSupportFunds = totalSupportFunds;
     }
 
-    public double getTotalSales() {
+    public BigDecimal getTotalSales() {
         return totalSales;
     }
 
-    public void setTotalSales(double totalSales) {
+    public void setTotalSales(BigDecimal totalSales) {
         this.totalSales = totalSales;
     }
 
@@ -72,19 +74,19 @@ public class SeasonAnalyticsDto {
         this.rejectedLoans = rejectedLoans;
     }
 
-    public double getTotalLoanAmount() {
+    public BigDecimal getTotalLoanAmount() {
         return totalLoanAmount;
     }
 
-    public void setTotalLoanAmount(double totalLoanAmount) {
+    public void setTotalLoanAmount(BigDecimal totalLoanAmount) {
         this.totalLoanAmount = totalLoanAmount;
     }
 
-    public double getRemainingBudget() {
+    public BigDecimal getRemainingBudget() {
         return remainingBudget;
     }
 
-    public void setRemainingBudget(double remainingBudget) {
+    public void setRemainingBudget(BigDecimal remainingBudget) {
         this.remainingBudget = remainingBudget;
     }
 

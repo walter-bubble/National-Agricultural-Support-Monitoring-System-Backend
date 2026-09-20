@@ -25,6 +25,7 @@ public class MarketListing {
     private LocalDateTime created = LocalDateTime.now();
     public MarketListing(String productCode,String sellerName,Long sellerId,String sellerType,String productName,double quantity,double price){
         this.sellerName=sellerName;
+        this.productCode=productCode;
         this.sellerId=sellerId;
         this.sellerType=sellerType;
         this.productName=productName;

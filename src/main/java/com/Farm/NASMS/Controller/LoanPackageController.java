@@ -2,6 +2,8 @@ package com.Farm.NASMS.Controller;
 
 import com.Farm.NASMS.model.LoanPackage;
 import com.Farm.NASMS.Service.LoanPackageService;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,8 +15,8 @@ private LoanPackageService loanPackageService;
 public LoanPackageController(LoanPackageService loanPackageService){
     this.loanPackageService=loanPackageService;
   }
-@PostMapping
-    public LoanPackage createLoanPackage(@RequestBody LoanPackage loanPackage){
+  @PostMapping("/loan")
+  public LoanPackage createLoanPackage(@RequestBody LoanPackage loanPackage){
     return loanPackageService.createLoanPackage(loanPackage);
   }
   @GetMapping

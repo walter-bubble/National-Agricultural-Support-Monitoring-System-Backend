@@ -4,6 +4,7 @@ import com.Farm.NASMS.enums.LoanStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -18,31 +19,31 @@ public class Loan {
     @JoinColumn(name = "farmer_id")//connect to farmer table
     private Farmer farmer;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="season_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "season_id")
     private FarmingSeason farmingSeason;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="loan_package_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loan_package_id")
     private LoanPackage loanPackage;
 
-    @OneToMany(mappedBy = "loan",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LoanPayment> loanPayments;
 
     //loan details
     @Column(nullable = false)
-    private double amount;
+    private BigDecimal amount;
 
     @Column(nullable = false)
-    private double interestRate;
+    private BigDecimal interestRate;
 
     @Column(nullable = false)
     private int durationMonths;
 
-    private double monthlyPenalty;
-    private double totalPayment;
+    private BigDecimal monthlyPenalty;
+    private BigDecimal totalPayment;
     private LocalDateTime dueDate;
-    private double remainingBalance;
+    private BigDecimal remainingBalance;
 
     @Enumerated(EnumType.STRING)
     private LoanStatus status;
@@ -52,11 +53,14 @@ public class Loan {
 
     //the life cycle
     @PrePersist
-    protected void onCreate(){
-        createdAt=LocalDateTime.now();
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
+
     //business logic here
-    public Loan(){}
+    public Loan() {
+    }
+
     public static Loan createLoanFromPackage(Farmer farmer, LoanPackage loanPackage) {
         Loan loan = new Loan();
         loan.setFarmer(farmer);
@@ -72,25 +76,36 @@ public class Loan {
         loan.setStatus(LoanStatus.ACTIVE);
         return loan;
     }
-    private static double calculateTotalPayment(Loan loan){
-        return loan.getAmount() + (loan.getAmount()*loan.getInterestRate()/100*loan.getDurationMonths()/12);
+
+    private static BigDecimal calculateTotalPayment(Loan loan) {
+        BigDecimal interest = loan.getAmount()
+                .multiply(loan.getInterestRate())
+                .multiply(BigDecimal.valueOf(loan.getDurationMonths()))
+                .divide(BigDecimal.valueOf(1200));
+        return loan.getAmount().add(interest);
     }
-    public double getRemainingBalance(){
-        double paid=(loanPayments==null) ? 0:
-                loanPayments.stream().mapToDouble(LoanPayment:: getTotalAmountPaid).sum();
-        return totalPayment-paid;
-    }
-    public double calculatePenalty(LocalDateTime dueDate){
-        if(dueDate != null && dueDate.isAfter(this.dueDate)){
-            long monthsLate = ChronoUnit.MONTHS.between(this.dueDate,dueDate);
-            return monthsLate * monthlyPenalty;
+
+    public BigDecimal getRemainingBalance() {
+        BigDecimal paid = BigDecimal.ZERO;
+        if (loanPayments != null) {
+            paid = loanPayments.stream().map(LoanPayment::getTotalAmountPaid).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
-        return 0;
+        return totalPayment.subtract(paid);
     }
-    public double calculateTotalDue(LocalDateTime paymentDate){
-        return this.totalPayment + calculatePenalty(paymentDate);
+
+    public BigDecimal calculatePenalty(LocalDateTime paymentDate) {
+        if (paymentDate != null && dueDate != null && paymentDate.isAfter(dueDate)) {
+            long monthsLate = ChronoUnit.MONTHS.between(dueDate, paymentDate);
+            return monthlyPenalty.multiply(BigDecimal.valueOf(monthsLate));
+        }
+        return BigDecimal.ZERO;
     }
-    public boolean isOverDue(){
-        return LocalDateTime.now().isAfter(dueDate) && getRemainingBalance()>0;
+
+    public BigDecimal calculateTotalDue(LocalDateTime paymentDate) {
+        return totalPayment.add(calculatePenalty(paymentDate));
+    }
+
+    public boolean isOverDue() {
+        return dueDate != null && LocalDateTime.now().isAfter(dueDate) && getRemainingBalance().compareTo(BigDecimal.ZERO) > 0;
     }
 }

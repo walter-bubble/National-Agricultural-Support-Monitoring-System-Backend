@@ -11,6 +11,6 @@ List <MarketTransaction>  getAllTransactions();
 List<MarketTransaction> getTransactionBySellerId(Long sellerId);
 List<MarketTransaction> getTransactionByBuyerId(Long buyerId);
 Optional<MarketTransaction> getTransactionById(Long id);
-MarketTransaction updateTransaction(MarketTransaction marketTransaction);
+MarketTransaction updateTransaction(Long id,MarketTransaction marketTransaction);
 void deleteTransaction(Long id);
 }

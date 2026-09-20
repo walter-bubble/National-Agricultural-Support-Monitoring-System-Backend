@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="NasmsApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="NASMS_ADMIN_USERNAME" value="bubblec" />
+      <env name="NASMS_ADMIN_EMAIL" value="admin@nasms.com" />
+      <env name="NASMS_ADMIN_PASSWORD" value="NasmsAdmin@2026" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.Farm.NASMS.NasmsApplication" />
+    <module name="NASMS" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

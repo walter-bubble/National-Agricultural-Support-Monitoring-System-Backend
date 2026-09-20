@@ -2,6 +2,7 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.Repository.FarmingSeasonRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class FarmingSeasonServiceImpl implements FarmingSeasonService{
         this.farmingSeasonRepository = farmingSeasonRepository;
     }
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public FarmingSeason createSeason(FarmingSeason season) {
         return farmingSeasonRepository.save(season);
     }
@@ -28,6 +30,7 @@ public class FarmingSeasonServiceImpl implements FarmingSeasonService{
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public FarmingSeason updateSeason(Long id, FarmingSeason season) {
         FarmingSeason existing = getSeasonById(id);
         existing.setSeasonName(season.getSeasonName());
@@ -35,13 +38,12 @@ public class FarmingSeasonServiceImpl implements FarmingSeasonService{
         existing.setEndDate(season.getEndDate());
         return farmingSeasonRepository.save(existing);
     }
-
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteSeason(Long id) {
         if (!farmingSeasonRepository.existsById(id)) {
             throw new RuntimeException("Season not found");
         }
         farmingSeasonRepository.deleteById(id);
-
     }
 }

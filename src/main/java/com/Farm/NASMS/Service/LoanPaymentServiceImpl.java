@@ -8,60 +8,70 @@ import com.Farm.NASMS.Repository.LoanPaymentRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
 import com.Farm.NASMS.dto.LoanPaymentRequest;
 import com.Farm.NASMS.dto.LoanPaymentResponse;
+import com.Farm.NASMS.security.AuthenticatedUserService;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
+
 
 @Service
 public class LoanPaymentServiceImpl implements LoanPaymentService {
-    private LoanPaymentRepository loanPaymentRepository;
-    private LoanRepository loanRepository;
-    public LoanPaymentServiceImpl(LoanPaymentRepository loanPaymentRepository,LoanRepository loanRepository){
+    private final LoanPaymentRepository loanPaymentRepository;
+    private final AuthenticatedUserService authenticatedUserService;
+    private final LoanRepository loanRepository;
+    public LoanPaymentServiceImpl(LoanPaymentRepository loanPaymentRepository,LoanRepository loanRepository,AuthenticatedUserService authenticatedUserService){
         this.loanPaymentRepository=loanPaymentRepository;
+        this.authenticatedUserService = authenticatedUserService;
         this.loanRepository=loanRepository;
     }
     @Override
     @Transactional
     public LoanPaymentResponse makePayment(Long id, LoanPaymentRequest request) {
         Loan loan = loanRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Loan does not exist"));
+                .orElseThrow(() -> new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Loan does not exist"));
+        if (!authenticatedUserService.isLoanOwner(loan)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
+        }
 
-        double amount = request.getAmountToPay();
+        BigDecimal amount = request.getAmountToPay();
         PaymentMethod paymentMethod = request.getPaymentMethod();
-        if (amount <= 0) {
-            throw new RuntimeException("amount to pay can't be zero!");
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"amount to pay can't be zero!");
         }
-        if (loan.getRemainingBalance() <= 0) {
-            throw new RuntimeException("Loan already repaid");
+        if (loan.getRemainingBalance().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Loan already repaid");
         }
-        if (amount > loan.getRemainingBalance()) {
-            throw new RuntimeException("The amount to pay exceeds the remaining balance");
+        if (amount.compareTo(loan.getRemainingBalance())>0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The amount to pay exceeds the remaining balance");
         }
+        BigDecimal previousTotal = loanPaymentRepository.findByLoan(loan)
+                .stream()
+                .map(LoanPayment::getAmountToPay)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalAmountPaid = previousTotal.add(amount);
         LoanPayment payment = new LoanPayment();
         payment.setLoan(loan);
-        payment.setPaymentMethod(paymentMethod);
         payment.setAmountToPay(amount);
+        payment.setPaymentMethod(paymentMethod);
+        payment.setPreviousTotal(previousTotal);
+        payment.setTotalAmountPaid(totalAmountPaid);
+
+
         //payment.setTransactionCode();
 
-        double newBalance = loan.getRemainingBalance() - amount;
+        BigDecimal newBalance = loan.getRemainingBalance().subtract(amount);
         loan.setRemainingBalance(newBalance);
         payment.setRemainingBalance(newBalance);
 
-        if (newBalance == 0) {
+        if (newBalance.compareTo(BigDecimal.ZERO) == 0) {
             loan.setStatus(LoanStatus.COMPLETED);
         }
         loanRepository.save(loan);
         LoanPayment saved = loanPaymentRepository.save(payment);
-
-        double previousTotal = loanPaymentRepository
-                .findByLoan(loan)
-                .stream()
-                .mapToDouble(LoanPayment::getAmountToPay)
-                .sum();
-        double totalAmountPaid = previousTotal + amount;
-
 
         LoanPaymentResponse response = new LoanPaymentResponse();
         response.setAmountToPay(saved.getAmountToPay());
@@ -70,7 +80,7 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
         response.setPaymentDate(saved.getPaymentDate());
         response.setTransactionCode(saved.getTransactionCode());
         response.setPaymentMethod(saved.getPaymentMethod());
-        response.setLoanCode(saved.getLoan().toString());
+        response.setLoanCode(String.valueOf(saved.getLoan().getId()));
 
         return response;
     }

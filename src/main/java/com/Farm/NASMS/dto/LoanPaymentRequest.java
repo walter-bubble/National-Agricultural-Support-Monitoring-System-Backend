@@ -2,16 +2,18 @@ package com.Farm.NASMS.dto;
 
 import com.Farm.NASMS.enums.PaymentMethod;
 
+import java.math.BigDecimal;
+
 public class LoanPaymentRequest {
-    private double amountToPay;
+    private BigDecimal amountToPay;
     private PaymentMethod paymentMethod;
     private String transactionCode;
 
-    public double getAmountToPay() {
+    public BigDecimal getAmountToPay() {
         return amountToPay;
     }
 
-    public void setAmountToPay(double amountToPay) {
+    public void setAmountToPay(BigDecimal amountToPay) {
         this.amountToPay = amountToPay;
     }
 

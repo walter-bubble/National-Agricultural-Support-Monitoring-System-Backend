@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
         if(userRepository.findByEmailAddress(request.getEmailAddress()).isPresent()){
              throw new RuntimeException("user exists");
         }
-        if(userRepository.findByUserName(request.getName()).isPresent()){
+        if(userRepository.findByUserName(request.getUserName()).isPresent()){
             throw new RuntimeException("username exists");
         }
         //check nationalId

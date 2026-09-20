@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/orders")
 public class ProductOrderingController {
-    private OrderProcessingService orderProcessingService;
+    private final OrderProcessingService orderProcessingService;
+
 
     public ProductOrderingController(OrderProcessingService orderProcessingService) {
         this.orderProcessingService = orderProcessingService;
@@ -24,10 +25,7 @@ public class ProductOrderingController {
         try {
             MarketTransaction completedTransaction = orderProcessingService.processBuyerOrder(
             request.getProductCode(),
-            request.getBuyerId(),
-            request.getBuyerName(),
-            request.getQuantity()
-            );
+            request.getQuantity());
             return new ResponseEntity<>(completedTransaction, HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error disrupted your ordering checkout flow.");

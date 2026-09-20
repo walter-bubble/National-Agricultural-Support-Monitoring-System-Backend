@@ -3,6 +3,7 @@ package com.Farm.NASMS.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 @Data
 @Entity
@@ -15,7 +16,7 @@ public class FarmingSeason {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean closed=false;
-    private double budget;
+    private BigDecimal budget;
     public boolean isActive(){
         LocalDate today = LocalDate.now();
         if(closed || startDate == null || endDate==null){

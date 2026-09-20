@@ -3,6 +3,7 @@ package com.Farm.NASMS.dto;
 import com.Farm.NASMS.enums.LoanStatus;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @JsonPropertyOrder({
         "farmerName",
@@ -20,9 +21,9 @@ public class LoanResponse {
     private String farmerName;
     private Long nationalId;
     private String seasonName;
-    private double amount;
+    private BigDecimal amount;
     private double interestRate;
-    private double totalPayment;
+    private BigDecimal totalPayment;
     private LoanStatus status;
     private LocalDateTime dueDate;
 
@@ -58,19 +59,19 @@ public class LoanResponse {
         this.seasonName = seasonName;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    public double getTotalPayment() {
+    public BigDecimal getTotalPayment() {
         return totalPayment;
     }
 
-    public void setTotalPayment(double totalPayment) {
+    public void setTotalPayment(BigDecimal totalPayment) {
         this.totalPayment = totalPayment;
     }
 

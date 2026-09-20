@@ -12,7 +12,7 @@ public interface MarketListingService {
     Optional<MarketListing> getProductById(Long id);
     List<MarketListing> getProductBySellerId(Long sellerId);
     List<MarketListing> getProductByName(String productName);
-    MarketListing updateProductList(MarketListing listing);
+    MarketListing updateProductList(Long id,MarketListing listing);
     void deleteListing(Long id);
 }
 

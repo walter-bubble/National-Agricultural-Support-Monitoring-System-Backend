@@ -10,6 +10,8 @@ import com.Farm.NASMS.dto.SeasonComparisonDto;
 import com.Farm.NASMS.dto.SeasonGraphDto;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +45,19 @@ public class AnalyticsServiceImpl implements AnalyticsService{
         seasonAnalyticsDto.setRejectedLoans(loanRepository.countLoansBySeason(seasonId)
                 -loanRepository.countApprovedLoans(seasonId));
 
-        double loanAmount = toDouble(loanRepository.getTotalLoanAmountBySeason(seasonId));
+        BigDecimal loanAmount = BigDecimal.valueOf((loanRepository.getTotalLoanAmountBySeason(seasonId)));
+        if (loanAmount == null) {
+            loanAmount = BigDecimal.ZERO;
+        }
         seasonAnalyticsDto.setTotalLoans(loanRepository.countLoansBySeason(seasonId));
         seasonAnalyticsDto.setTotalSupportFunds(farmingSeason.getBudget());
         seasonAnalyticsDto.setTotalSales(marketTransactionRepository.getTotalSalesBySeason(seasonId));
-        seasonAnalyticsDto.setRemainingBudget(farmingSeason.getBudget()-loanAmount);
-        seasonAnalyticsDto.setLoanUtilizationRate(farmingSeason.getBudget() == 0 ? 0
-                :(loanAmount/farmingSeason.getBudget())*100);
+
+        seasonAnalyticsDto.setRemainingBudget(farmingSeason.getBudget().subtract(loanAmount));
+        seasonAnalyticsDto.setLoanUtilizationRate(farmingSeason.getBudget().compareTo(BigDecimal.ZERO) == 0 ? 0
+                :loanAmount
+                .divide(farmingSeason.getBudget(),4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100)).doubleValue());
         return seasonAnalyticsDto;
     }
 
@@ -63,9 +71,9 @@ public class AnalyticsServiceImpl implements AnalyticsService{
         seasonComparisonDto.setSeason2(s2.getSeasonName());
 
         //sales
-        seasonComparisonDto.setSeason1Sales(s1.getTotalSales());
-        seasonComparisonDto.setSeason2Sales(s2.getTotalSales());
-        seasonComparisonDto.setSalesGrowthPercentage(calcGrowth(s1.getTotalSales(), s2.getTotalSales()));
+        seasonComparisonDto.setSeason1Sales(toDouble(s1.getTotalSales()));
+        seasonComparisonDto.setSeason2Sales(toDouble(s2.getTotalSales()));
+        seasonComparisonDto.setSalesGrowthPercentage(calcGrowth(toDouble(s1.getTotalSales()), toDouble(s2.getTotalSales())));
 
         //farmers
         seasonComparisonDto.setSeason1Farmers(s1.getTotalFarmers());
