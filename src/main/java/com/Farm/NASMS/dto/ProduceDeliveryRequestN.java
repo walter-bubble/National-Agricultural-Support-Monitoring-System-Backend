@@ -1,5 +1,9 @@
 package com.Farm.NASMS.dto;
 
+
+
+import java.util.List;
+
 public class ProduceDeliveryRequestN {
     private String productName;
     private double quantityKg;

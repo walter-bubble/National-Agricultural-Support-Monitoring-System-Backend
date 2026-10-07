@@ -143,7 +143,7 @@ public class LoanServiceImpl implements LoanService {
     }
     @Override
     public List<Loan> getLoansByFarmer(Long nationalId,String status) {
-        if(!authenticatedUserService.isCurrentFarmerNationalId(nationalId) || !authenticatedUserService.isAdmin()){
+        if(!authenticatedUserService.isCurrentFarmerNationalId(nationalId)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied");
         }
 

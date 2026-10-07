@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product addProduct(ProductRequest request) {
-        if(!authenticatedUserService.isAdmin() && !authenticatedUserService.isCurrentFarmer(request.getFarmerId())){
+        if(!authenticatedUserService.isCurrentFarmer(request.getFarmerId())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied");
         }
         Farmer farmer = farmerRepository.findById(request.getFarmerId())
@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String deleteProduct(Long id) {
         Product existing = productRepo.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Product doesn't exist"));
-        if (!authenticatedUserService.isProductOwner(existing) && !authenticatedUserService.isAdmin()) {
+        if (!authenticatedUserService.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
        productRepo.delete(existing);

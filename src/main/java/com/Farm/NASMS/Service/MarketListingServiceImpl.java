@@ -20,7 +20,7 @@ public class MarketListingServiceImpl implements MarketListingService{
   }
     @Override
     public MarketListing createList(MarketListing listing) {
-        if (!authenticatedUserService.isAdmin() && !authenticatedUserService.isCurrentSeller(listing.getSellerId())) {
+        if (!authenticatedUserService.isCurrentSeller(listing.getSellerId())) {
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Access denied");
         }
         return marketListingRepository.save(listing);
@@ -38,7 +38,7 @@ public class MarketListingServiceImpl implements MarketListingService{
 
     @Override
     public List<MarketListing> getProductBySellerId(Long sellerId) {
-        if (!authenticatedUserService.isAdmin() && !authenticatedUserService.isCurrentSeller(sellerId)) {
+        if (!authenticatedUserService.isCurrentSeller(sellerId)) {
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Access denied");
         }
         return marketListingRepository.findBySellerId(sellerId);
@@ -53,7 +53,7 @@ public class MarketListingServiceImpl implements MarketListingService{
     public MarketListing updateProductList(Long id,MarketListing listing) {
       MarketListing existing = marketListingRepository.findById(id)
               .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"LISTING NOT FOUND"));
-        if (!authenticatedUserService.isListingOwner(existing) && !authenticatedUserService.isAdmin()) {
+        if (!authenticatedUserService.isListingOwner(existing)) {
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Access denied");
         }
         existing.setProductName(listing.getProductName());
@@ -71,7 +71,7 @@ public class MarketListingServiceImpl implements MarketListingService{
                         org.springframework.http.HttpStatus.NOT_FOUND,
                         "Listing not found"
                 ));
-        if (!authenticatedUserService.isListingOwner(existing) && !authenticatedUserService.isAdmin()) {
+        if (!authenticatedUserService.isListingOwner(existing) ) {
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Access denied");
         }
         marketListingRepository.deleteById(id);

@@ -23,7 +23,7 @@ public class MarketTransactionImpl implements MarketTransactionService{
 
     @Override
     public MarketTransaction createTransaction(MarketTransaction transaction) {
-        if (!authenticatedUserService.isAdmin() && !authenticatedUserService.isCurrentBuyer(transaction.getBuyerId())){
+        if (!authenticatedUserService.isCurrentBuyer(transaction.getBuyerId())){
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN,"Access denied");
         }
         return marketTransactionRepository.save(transaction);
@@ -45,7 +45,7 @@ public class MarketTransactionImpl implements MarketTransactionService{
 
     @Override
     public List<MarketTransaction> getTransactionByBuyerId(Long buyerId) {
-        if(!authenticatedUserService.isAdmin() && !authenticatedUserService.isCurrentBuyer(buyerId)){
+        if(!authenticatedUserService.isCurrentBuyer(buyerId)){
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN,"Acess denied");
         }
         return marketTransactionRepository.findByBuyerId(buyerId);
@@ -61,7 +61,7 @@ public class MarketTransactionImpl implements MarketTransactionService{
         MarketTransaction existing = marketTransactionRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transaction not found"));
 
-        if(!authenticatedUserService.isTransactionOwner(existing) && !authenticatedUserService.isAdmin()){
+        if(!authenticatedUserService.isTransactionOwner(existing)){
             throw new ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN,"Access denied");
         }
         existing.setSellerType(marketTransaction.getSellerType());
@@ -77,7 +77,7 @@ public class MarketTransactionImpl implements MarketTransactionService{
     public void deleteTransaction(Long id) {
         MarketTransaction existing = marketTransactionRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transaction not found"));
-        if(!authenticatedUserService.isTransactionOwner(existing) && !authenticatedUserService.isAdmin()){
+        if(!authenticatedUserService.isTransactionOwner(existing)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied");
         }
         marketTransactionRepository.delete(existing);
