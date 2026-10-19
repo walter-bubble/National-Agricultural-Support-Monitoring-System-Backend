@@ -12,7 +12,7 @@ public class LoanPaymentResponse {
     private PaymentMethod paymentMethod;
     private String transactionCode;
     private LocalDateTime paymentDate;
-    private String loanCode;
+
 
     public BigDecimal getAmountToPay() {
         return amountToPay;
@@ -61,12 +61,5 @@ public class LoanPaymentResponse {
     public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
-
-    public String getLoanCode() {
-        return loanCode;
-    }
-
-    public void setLoanCode(String loanCode) {
-        this.loanCode = loanCode;
-    }
 }
+

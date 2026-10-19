@@ -80,7 +80,7 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
         response.setPaymentDate(saved.getPaymentDate());
         response.setTransactionCode(saved.getTransactionCode());
         response.setPaymentMethod(saved.getPaymentMethod());
-        response.setLoanCode(String.valueOf(saved.getLoan().getId()));
+
 
         return response;
     }
