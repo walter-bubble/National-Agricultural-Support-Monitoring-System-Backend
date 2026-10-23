@@ -4,7 +4,6 @@ import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.Repository.FarmerRepository;
 import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
-import com.Farm.NASMS.Repository.MarketTransactionRepository;
 import com.Farm.NASMS.dto.SeasonAnalyticsDto;
 import com.Farm.NASMS.dto.SeasonComparisonDto;
 import com.Farm.NASMS.dto.SeasonGraphDto;
@@ -20,15 +19,12 @@ import java.util.List;
 public class AnalyticsServiceImpl implements AnalyticsService{
     private FarmerRepository farmerRepository;
     private LoanRepository loanRepository;
-    private MarketTransactionRepository marketTransactionRepository;
     private FarmingSeasonRepository farmingSeasonRepository;
     public AnalyticsServiceImpl(FarmingSeasonRepository farmingSeasonRepository,
-                                MarketTransactionRepository marketTransactionRepository,
                                 LoanRepository loanRepository,
                                 FarmerRepository farmerRepository){
         this.farmerRepository=farmerRepository;
         this.loanRepository=loanRepository;
-        this.marketTransactionRepository=marketTransactionRepository;
         this.farmingSeasonRepository=farmingSeasonRepository;
     }
     @Override
@@ -51,7 +47,7 @@ public class AnalyticsServiceImpl implements AnalyticsService{
         }
         seasonAnalyticsDto.setTotalLoans(loanRepository.countLoansBySeason(seasonId));
         seasonAnalyticsDto.setTotalSupportFunds(farmingSeason.getBudget());
-        seasonAnalyticsDto.setTotalSales(marketTransactionRepository.getTotalSalesBySeason(seasonId));
+
 
         seasonAnalyticsDto.setRemainingBudget(farmingSeason.getBudget().subtract(loanAmount));
         seasonAnalyticsDto.setLoanUtilizationRate(farmingSeason.getBudget().compareTo(BigDecimal.ZERO) == 0 ? 0
@@ -98,7 +94,6 @@ public class AnalyticsServiceImpl implements AnalyticsService{
         List<SeasonGraphDto> list = new ArrayList<>();
         for(FarmingSeason season:seasons){
             double loans = toDouble(loanRepository.getTotalLoanAmountBySeason(season.getId()));
-            double sales = toDouble(marketTransactionRepository.getTotalSalesBySeason(season.getId()));
 
             SeasonGraphDto loanDto = new SeasonGraphDto();
             loanDto.setSeasonName(season.getSeasonName());
@@ -109,7 +104,6 @@ public class AnalyticsServiceImpl implements AnalyticsService{
             SeasonGraphDto salesDto = new SeasonGraphDto();
             salesDto.setSeasonName(season.getSeasonName());
             salesDto.setMetricType("SALES");
-            salesDto.setValue(sales);
             list.add(salesDto);
         }
         return list;

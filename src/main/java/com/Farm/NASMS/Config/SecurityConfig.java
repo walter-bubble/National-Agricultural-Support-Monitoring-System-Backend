@@ -45,10 +45,14 @@ public class SecurityConfig{
         .csrf(csrf ->csrf.disable())
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login",
-                    "/api/auth/register").permitAll()
-            .requestMatchers("/api/auth/me").authenticated()
-            .anyRequest().authenticated()
+                .requestMatchers(
+                        "/api/auth/login",
+                        "/api/auth/register",
+                        "/api/agrovets/apply"
+                ).permitAll()
+
+                .requestMatchers("/api/auth/me").authenticated()
+                .anyRequest().authenticated()
         )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(exceptions -> exceptions

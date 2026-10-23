@@ -13,6 +13,15 @@ public class MpesaProperties {
     private String oauthUrl;
     private String stkUrl;
     private String callbackUrl;
+    private String marketPlaceCallbackUrl;
+
+    public String getMarketPlaceCallbackUrl() {
+        return marketPlaceCallbackUrl;
+    }
+
+    public void setMarketPlaceCallbackUrl(String marketPlaceCallbackUrl) {
+        this.marketPlaceCallbackUrl = marketPlaceCallbackUrl;
+    }
 
     public String getConsumerKey() {
         return consumerKey;

@@ -48,20 +48,6 @@ public class AuthenticatedUserService {
         }
         return isFarmer() && loan.getFarmer() != null && loan.getFarmer().getId().equals(getCurrentFarmer().getId());
     }
-     public boolean isListingOwner(MarketListing listing) {
-        if (isAdmin()) {
-            return true;
-        }
-        return isFarmer() && listing.getSellerId() != null && listing.getSellerId().equals(getCurrentFarmer().getId());
-    }
-
-    public boolean isTransactionOwner(MarketTransaction transaction) {
-        if (isAdmin()) {
-            return true;
-        }
-        Long currentFarmerId = getCurrentFarmer().getId();
-        return transaction != null && (currentFarmerId.equals(transaction.getBuyerId()) || currentFarmerId.equals(transaction.getSellerId()));
-    }
 
     public boolean isCurrentBuyer(Long buyerId) {
         return isAdmin() || (isFarmer() && getCurrentFarmer().getId().equals(buyerId));
@@ -69,14 +55,5 @@ public class AuthenticatedUserService {
 
     public boolean isCurrentSeller(Long sellerId) {
         return isAdmin() || (isFarmer() && getCurrentFarmer().getId().equals(sellerId));
-    }
-    public boolean isProductOwner(Product product) {
-        if (isAdmin()) {
-            return true;
-        }
-        return isFarmer()
-                && product != null
-                && product.getFarmer() != null
-                && product.getFarmer().getId().equals(getCurrentFarmer().getId());
     }
 }

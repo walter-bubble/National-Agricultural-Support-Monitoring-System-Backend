@@ -1,0 +1,13 @@
+package com.Farm.NASMS.enums;
+
+public enum AgrovetProductCategory {
+    SEEDS,
+    FERTILIZERS,
+    ANIMAL_FEEDS,
+    IRRIGATION_EQUIPMENT,
+    PESTICIDES,
+    HERBICIDES,
+    FUNGICIDES,
+    FARM_TOOLS_AND_EQUIPMENT,
+    VETERINARY_PRODUCTS
+}
