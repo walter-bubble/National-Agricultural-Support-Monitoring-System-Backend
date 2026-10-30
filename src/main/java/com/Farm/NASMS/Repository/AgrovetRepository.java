@@ -11,4 +11,7 @@ public interface AgrovetRepository extends JpaRepository<Agrovet,Long> {
     Optional<Agrovet> findById(Long userId);
     boolean existsByBusinessNameIgnoreCase(String businessName);
     List<Agrovet>findByStatus(AgrovetStatus status);
+    Optional<Agrovet> findByUser_EmailAddress(String emailAddress);
+
+
 }

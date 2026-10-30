@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmailAddress(emailAddress)
                 .orElseThrow(()->new RuntimeException("user not found"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new RuntimeException("Invalid Password or EmailAddress");
         }
         return jwtUtil.generateToken(emailAddress);
     }

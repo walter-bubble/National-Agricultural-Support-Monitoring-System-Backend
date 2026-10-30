@@ -1,5 +1,6 @@
 package com.Farm.NASMS.security;
 
+import com.Farm.NASMS.Repository.AgrovetRepository;
 import com.Farm.NASMS.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -13,8 +14,10 @@ import com.Farm.NASMS.Repository.FarmerRepository;
 @Component
 public class AuthenticatedUserService {
     private final FarmerRepository farmerRepository;
-    public AuthenticatedUserService(FarmerRepository farmerRepository){
+    private final AgrovetRepository agrovetRepository;
+    public AuthenticatedUserService(FarmerRepository farmerRepository, AgrovetRepository agrovetRepository){
         this.farmerRepository = farmerRepository;
+        this.agrovetRepository = agrovetRepository;
     }
     public User getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -55,5 +58,15 @@ public class AuthenticatedUserService {
 
     public boolean isCurrentSeller(Long sellerId) {
         return isAdmin() || (isFarmer() && getCurrentFarmer().getId().equals(sellerId));
+    }
+    public Agrovet getCurrentAgrovet() {
+        User currentUser = getCurrentUser();
+
+        if (!"AGROVET".equalsIgnoreCase(currentUser.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only Agrovets can access this resource");
+        }
+        return agrovetRepository
+                .findByUser_EmailAddress(currentUser.getEmailAddress())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agrovet profile not found"));
     }
 }

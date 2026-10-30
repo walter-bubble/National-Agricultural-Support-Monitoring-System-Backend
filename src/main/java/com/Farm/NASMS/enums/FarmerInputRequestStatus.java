@@ -1,0 +1,18 @@
+package com.Farm.NASMS.enums;
+
+public enum FarmerInputRequestStatus {
+    DRAFT,
+    SUBMITTED,
+    UNDER_REVIEW,
+    PARTIALLY_FORWARDED,
+    FORWARDED,
+    REJECTED,
+    PARTIALLY_FULFILLED,
+    COMPLETED,
+    CANCELED,
+    APPROVED,
+    PARTIALLY_ACCEPTED,
+    ACCEPTED,
+    PARTIALLY_REVIEWED,
+    DECLINED_BY_AGROVETS
+}
