@@ -3,6 +3,7 @@ package com.Farm.NASMS.security;
 import com.Farm.NASMS.Repository.AgrovetRepository;
 import com.Farm.NASMS.model.*;
 import org.springframework.http.HttpStatus;
+import com.walter.toolkit.security_starter.user.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,10 @@ public class AuthenticatedUserService {
     }
     public User getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null ||
-                !authentication.isAuthenticated() ||
-                !(authentication.getPrincipal() instanceof CustomUserDetails)){
+        if(authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof CustomUserDetails customDetails) || !(customDetails.user() instanceof User user)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
         }
-        return ((CustomUserDetails) authentication.getPrincipal()).user();
+        return user;
     }
     public Farmer getCurrentFarmer(){
         User currentUser = getCurrentUser();
@@ -65,8 +64,7 @@ public class AuthenticatedUserService {
         if (!"AGROVET".equalsIgnoreCase(currentUser.getRole())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only Agrovets can access this resource");
         }
-        return agrovetRepository
-                .findByUser_EmailAddress(currentUser.getEmailAddress())
+        return agrovetRepository.findByUser_EmailAddress(currentUser.getEmailAddress())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agrovet profile not found"));
     }
 }

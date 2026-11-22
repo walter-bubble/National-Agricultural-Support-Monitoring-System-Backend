@@ -8,8 +8,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 public interface ProduceOrderNService {
-
     ProduceDeliveryResponseN placeOrder(Long nationalId, ProduceDeliveryRequestN requestN);
-
-    List<ProduceDeliveryN> getMyOrders(Long nationalId);
+    List<ProduceDeliveryResponseN> getMyOrders(Long nationalId);
 }

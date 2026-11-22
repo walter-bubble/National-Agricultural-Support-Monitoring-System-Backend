@@ -1,13 +1,15 @@
 package com.Farm.NASMS.Service;
 
+import com.Farm.NASMS.dto.FarmingSeasonRequest;
+import com.Farm.NASMS.dto.FarmingSeasonResponse;
 import com.Farm.NASMS.model.FarmingSeason;
 
 import java.util.List;
 
 public interface FarmingSeasonService {
-    FarmingSeason createSeason(FarmingSeason season);
-    List<FarmingSeason> getAllSeasons();
-    FarmingSeason getSeasonById(Long id);
-    FarmingSeason updateSeason(Long id, FarmingSeason season);
+    FarmingSeasonResponse createSeason(FarmingSeasonRequest request);
+    List<FarmingSeasonResponse> getAllSeasons();
+    FarmingSeasonResponse getSeasonById(Long id);
+    FarmingSeasonResponse updateSeason(Long id, FarmingSeasonRequest request);
     void deleteSeason(Long id);
 }

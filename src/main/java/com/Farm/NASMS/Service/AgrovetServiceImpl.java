@@ -9,6 +9,7 @@ import com.Farm.NASMS.enums.AgrovetOperationalStatus;
 import com.Farm.NASMS.enums.AgrovetStatus;
 import com.Farm.NASMS.model.Agrovet;
 import com.Farm.NASMS.model.User;
+import com.walter.toolkit.security_starter.audit.Auditable;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,6 +46,7 @@ public class AgrovetServiceImpl implements AgrovetService{
         user.setEmailAddress(request.getEmailAddress().trim());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("AGROVET");
+        user.setEnabled(false);
         User savedUser = userRepository.save(user);
         Agrovet agrovet = new Agrovet();
         agrovet.setUser(savedUser);
@@ -77,18 +79,24 @@ public class AgrovetServiceImpl implements AgrovetService{
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "AGROVET_APPROVED")
     public AdminAgrovetResponse approve(Long id) {
         Agrovet agrovet = getPendingAgrovet(id);
         agrovet.setStatus(AgrovetStatus.APPROVED);
         agrovet.setOperationalStatus(AgrovetOperationalStatus.ACTIVE);
         agrovet.setReviewedAt(LocalDateTime.now());
+        if (agrovet.getUser() != null) {
+            agrovet.getUser().setEnabled(true);
+        }
         Agrovet savedAgrovet = agrovetRepository.save(agrovet);
         return toAdminResponse(savedAgrovet);
     }
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "AGROVET_DEACTIVATED")
     public AdminAgrovetResponse deactivate(Long id) {
         Agrovet agrovet = agrovetRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agrovet not found"));
@@ -100,6 +108,9 @@ public class AgrovetServiceImpl implements AgrovetService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Agrovet is already inactive");
         }
         agrovet.setOperationalStatus(AgrovetOperationalStatus.INACTIVE);
+        if(agrovet.getUser() !=null){
+            agrovet.getUser().setEnabled(false);
+        }
         Agrovet savedAgrovet = agrovetRepository.save(agrovet);
         return toAdminResponse(savedAgrovet);
     }
@@ -107,6 +118,7 @@ public class AgrovetServiceImpl implements AgrovetService{
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "AGROVET_REACTIVATED")
     public AdminAgrovetResponse reactivate(Long id) {
         Agrovet agrovet = agrovetRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agrovet not found"));
@@ -117,16 +129,24 @@ public class AgrovetServiceImpl implements AgrovetService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Agrovet is already active");
         }
         agrovet.setOperationalStatus(AgrovetOperationalStatus.ACTIVE);
+        if (agrovet.getUser() != null) {
+            agrovet.getUser().setEnabled(true);
+        }
         Agrovet savedAgrovet = agrovetRepository.save(agrovet);
         return toAdminResponse(savedAgrovet);
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action="AGROVET_REJECTED")
     public AdminAgrovetResponse reject(Long id) {
         Agrovet agrovet =getPendingAgrovet(id);
         agrovet.setStatus(AgrovetStatus.REJECTED);
         agrovet.setReviewedAt(LocalDateTime.now());
+        if (agrovet.getUser() != null) {
+            agrovet.getUser().setEnabled(false);
+        }
         Agrovet savedAgrovet = agrovetRepository.save(agrovet);
         return toAdminResponse(savedAgrovet);
     }

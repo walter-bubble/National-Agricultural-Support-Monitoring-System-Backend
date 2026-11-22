@@ -4,8 +4,11 @@ import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
 import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.model.LoanPackage;
+import com.walter.toolkit.security_starter.audit.Auditable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,15 +22,19 @@ public class LoanPackageServiceImpl implements LoanPackageService {
     }
     @Override
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "LOAN_PACKAGE_CREATED")
     public LoanPackage createLoanPackage(LoanPackage loanPackage) {
         FarmingSeason activeSeason = farmingSeasonRepository
                 .findActiveSeason()
-                .orElseThrow(()-> new RuntimeException("No active season found") );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No active season found"));
         BigDecimal seasonBudget = activeSeason.getBudget();
         BigDecimal allocatedAmount = loanPackageRepository.sumPackageAmountsByFarmingSeason(activeSeason);
+        if (allocatedAmount == null) {
+            allocatedAmount = BigDecimal.ZERO;
+        }
         BigDecimal remainingBudget = seasonBudget.subtract(allocatedAmount);
         if(loanPackage.getAmount().compareTo(remainingBudget)>0){
-            throw new RuntimeException("Loan package exceeds the remaining farming season budget. " + " Remaining budget: " + remainingBudget);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loan package exceeds the remaining farming season budget. Remaining budget: " + remainingBudget);
         }
         loanPackage.setFarmingSeason(activeSeason);
         return loanPackageRepository.save(loanPackage);
@@ -39,10 +46,11 @@ public class LoanPackageServiceImpl implements LoanPackageService {
     @Override
     public LoanPackage getLoanPackageById(Long id) {
         return loanPackageRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Loan Package not found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan Package not found!"));
     }
     @Override
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "LOAN_PACKAGE_UPDATED")
     public LoanPackage updateLoanPackage(Long id,LoanPackage loanPackage){
         LoanPackage existing = getLoanPackageById(id);
         existing.setAmount(loanPackage.getAmount());
@@ -56,6 +64,7 @@ public class LoanPackageServiceImpl implements LoanPackageService {
     }
     @Override
     @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "LOAN_PACKAGE_DELETED")
     public void deleteLoanPackage(Long id) {
         LoanPackage existing=getLoanPackageById(id);
         loanPackageRepository.delete(existing);

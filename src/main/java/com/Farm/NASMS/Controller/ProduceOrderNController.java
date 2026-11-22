@@ -3,7 +3,6 @@ package com.Farm.NASMS.Controller;
 import com.Farm.NASMS.Service.ProduceOrderNServiceImpl;
 import com.Farm.NASMS.dto.ProduceDeliveryRequestN;
 import com.Farm.NASMS.dto.ProduceDeliveryResponseN;
-import com.Farm.NASMS.model.ProduceDeliveryN;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +21,8 @@ public class ProduceOrderNController {
         ProduceDeliveryResponseN order = produceOrderNServiceImpl.placeOrder(nationalId,requestN);
         return ResponseEntity.ok(order);
     }
-    @GetMapping("/list")
-    public ResponseEntity<List<ProduceDeliveryN>> getMyOrders(@PathVariable Long nationalId){
+    @GetMapping("/list/{nationalId}")
+    public ResponseEntity<List<ProduceDeliveryResponseN>> getMyOrders(@PathVariable Long nationalId){
         return ResponseEntity.ok(produceOrderNServiceImpl.getMyOrders(nationalId));
     }
 }

@@ -12,7 +12,9 @@ import com.Farm.NASMS.enums.PaymentStatus;
 import com.Farm.NASMS.model.Loan;
 import com.Farm.NASMS.model.LoanPayment;
 import com.Farm.NASMS.security.AuthenticatedUserService;
+import com.walter.toolkit.security_starter.audit.Auditable;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +38,9 @@ public class MpesaServiceImpl implements MpesaService{
     private final RestClient restClient;
     private final LoanPaymentRepository loanPaymentRepository;
 
+    @Value("${mpesa.stk-query-url:https://safaricom.co.ke}")
+    private String stkQueryUrl;
+
     public MpesaServiceImpl(LoanRepository loanRepository, AuthenticatedUserService authenticatedUserService, MpesaProperties mpesaProperties, RestClient.Builder restClientBuilder, LoanPaymentRepository loanPaymentRepository) {
         this.loanRepository = loanRepository;
         this.authenticatedUserService = authenticatedUserService;
@@ -45,6 +50,7 @@ public class MpesaServiceImpl implements MpesaService{
     }
 
     @Override
+    @Auditable(action = "MPESA_STK_INITIATED")
     public MpesaStkResponse initiateStkPush(Long loanId, MpesaStkRequest request) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Loan does not exist"));
@@ -76,257 +82,116 @@ public class MpesaServiceImpl implements MpesaService{
         stkRequest.put("TransactionDesc", "NASMS Loan Payment");
         Map response = restClient.post()
                 .uri(mpesaProperties.getStkUrl())
-                .header(
-                        HttpHeaders.AUTHORIZATION,
-                        "Bearer " + accessToken
-                )
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(stkRequest)
                 .retrieve()
                 .body(Map.class);
-
         if (response == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "No response received from M-Pesa"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "No response received from M-Pesa");
         }
-
-        String merchantRequestId =
-                String.valueOf(
-                        response.get("MerchantRequestID")
-                );
-
-        String checkoutRequestId =
-                String.valueOf(
-                        response.get("CheckoutRequestID")
-                );
-        if (checkoutRequestId == null ||
-                checkoutRequestId.isBlank()) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Checkout request ID is missing"
-            );
+        String merchantRequestId = String.valueOf(response.get("MerchantRequestID"));
+        String checkoutRequestId = String.valueOf(response.get("CheckoutRequestID"));
+        if (checkoutRequestId == null || checkoutRequestId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Checkout request ID is missing");
         }
-
-        String responseCode =
-                String.valueOf(
-                        response.get("ResponseCode")
-                );
-
-        String responseDescription =
-                String.valueOf(
-                        response.get("ResponseDescription")
-                );
-
-        String customerMessage =
-                String.valueOf(
-                        response.get("CustomerMessage")
-                );
+        String responseCode = String.valueOf(response.get("ResponseCode"));
+        String responseDescription = String.valueOf(response.get("ResponseDescription"));
+        String customerMessage = String.valueOf(response.get("CustomerMessage"));
         if ("0".equals(responseCode)) {
-
             LoanPayment payment = new LoanPayment();
-
             payment.setLoan(loan);
             payment.setAmountToPay(amount);
-
             payment.setStatus(PaymentStatus.PENDING);
-
             payment.setMerchantRequestId(merchantRequestId);
-
             payment.setCheckoutRequestId(checkoutRequestId);
-
             payment.setPaymentMethod(PaymentMethod.M_PESA);
-
             loanPaymentRepository.save(payment);
         }
-        MpesaStkResponse stkResponse =
-                new MpesaStkResponse();
-
-        stkResponse.setMerchantRequestId(
-                merchantRequestId
-        );
-
-        stkResponse.setCheckoutRequestId(
-                checkoutRequestId
-        );
-
-        stkResponse.setResponseCode(
-                responseCode
-        );
-
-        stkResponse.setResponseDescription(
-                responseDescription
-        );
-
-        stkResponse.setCustomerMessage(
-                customerMessage
-        );
-
+        MpesaStkResponse stkResponse = new MpesaStkResponse();
+        stkResponse.setMerchantRequestId(merchantRequestId);
+        stkResponse.setCheckoutRequestId(checkoutRequestId);
+        stkResponse.setResponseCode(responseCode);
+        stkResponse.setResponseDescription(responseDescription);
+        stkResponse.setCustomerMessage(customerMessage);
         return stkResponse;
     }
-
     private String getAccessToken() {
-
-        String credentials =
-                mpesaProperties.getConsumerKey()
-                        + ":"
-                        + mpesaProperties.getConsumerSecretKey();
-
-        String encodedCredentials =
-                Base64.getEncoder()
-                        .encodeToString(
-                                credentials.getBytes(
-                                        StandardCharsets.UTF_8
-                                )
-                        );
-
-        Map response = restClient.get()
-                .uri(mpesaProperties.getOauthUrl())
-                .header(
-                        HttpHeaders.AUTHORIZATION,
-                        "Basic " + encodedCredentials
-                )
+        String credentials = mpesaProperties.getConsumerKey() + ":" + mpesaProperties.getConsumerSecretKey();
+        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+        Map response = restClient.get().uri(mpesaProperties.getOauthUrl())
+                .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedCredentials)
                 .retrieve()
                 .body(Map.class);
-
-        if (response == null ||
-                response.get("access_token") == null) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Unable to obtain M-Pesa access token"
-            );
+        if (response == null || response.get("access_token") == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to obtain M-Pesa access token");
         }
-
-        return String.valueOf(
-                response.get("access_token")
-        );
+        return String.valueOf(response.get("access_token"));
     }
-
     private String generatePassword(String timestamp) {
-
-        String data =
-                mpesaProperties.getShortcode()
-                        + mpesaProperties.getPassKey()
-                        + timestamp;
-
-        return Base64.getEncoder()
-                .encodeToString(
-                        data.getBytes(StandardCharsets.UTF_8)
-                );
+        String data = mpesaProperties.getShortcode() + mpesaProperties.getPassKey() + timestamp;
+        return Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8));
     }
-
     private String formatPhoneNumber(String phoneNumber) {
-
-        if (phoneNumber == null ||
-                phoneNumber.isBlank()) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Phone number is required"
-            );
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
         }
         phoneNumber = phoneNumber.trim();
-
-        if (phoneNumber.startsWith("07") ||
-                phoneNumber.startsWith("01")) {
-
+        if (phoneNumber.startsWith("07") || phoneNumber.startsWith("01")) {
             return "254" + phoneNumber.substring(1);
         }
-
         if (phoneNumber.startsWith("+254")) {
             return phoneNumber.substring(1);
         }
-
         if (phoneNumber.startsWith("254")) {
             return phoneNumber;
         }
-
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Invalid Kenyan phone number"
-        );
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Kenyan phone number");
     }
     @Override
     @Transactional
+    @Auditable(action = "MPESA_PAYMENT_CALLBACK_PROCESSED")
     public void processCallback(MpesaCallbackRequest request) {
-        if (request == null ||
-                request.getBody() == null ||
-                request.getBody().getStkCallback() == null) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Invalid M-Pesa callback"
-            );
+        if (request == null || request.getBody() == null || request.getBody().getStkCallback() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid M-Pesa callback");
         }
-
-        MpesaCallbackRequest.StkCallback callback =
-                request.getBody().getStkCallback();
-
-        String checkoutRequestId =
-                callback.getCheckoutRequestId();
-
-        LoanPayment payment =
-                loanPaymentRepository
-                        .findByCheckoutRequestId(checkoutRequestId)
-                        .orElseThrow(() ->
-                                new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Payment does not exist"
-                                )
-                        );
-
+        MpesaCallbackRequest.StkCallback callback = request.getBody().getStkCallback();
+        String checkoutRequestId = callback.getCheckoutRequestId();
+        LoanPayment payment = loanPaymentRepository.findByCheckoutRequestId(checkoutRequestId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment does not exist"));
         // Prevent duplicate callbacks from processing the payment twice
         if (payment.getStatus() == PaymentStatus.COMPLETED) {
             return;
         }
-
         // Payment failed or was cancelled
-        if (callback.getResultCode() != 0) {
-
+        if (callback.getResultCode() == null || callback.getResultCode() != 0) {
             payment.setStatus(PaymentStatus.FAILED);
-
             loanPaymentRepository.save(payment);
-
             return;
         }
-
-        // Payment was successful
-        BigDecimal paymentAmount =
-                payment.getAmountToPay();
-
-        Loan loan =
-                payment.getLoan();
-
-        BigDecimal previousBalance =
-                loan.getRemainingBalance();
-
-        BigDecimal previousTotalPaid =
-                loan.getTotalPayment()
-                        .subtract(previousBalance);
-
-        BigDecimal newBalance =
-                previousBalance.subtract(paymentAmount);
-
-        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Payment exceeds remaining loan balance"
-            );
+        // Verify directly with Safaricom Daraja STK Push Query before trusting the callback
+        if (!verifyWithStkQuery(checkoutRequestId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "STK Push Query verification failed");
         }
-
-        BigDecimal totalAmountPaid =
-                previousTotalPaid.add(paymentAmount);
-
-        String receiptNumber =
-                getMetadataValue(
-                        callback,
-                        "MpesaReceiptNumber"
-                );
-
+        // Verify paid amount matches or covers the expected payment amount
+        String amountStr = getMetadataValue(callback, "Amount"); // <--- PLACE HERE
+        if (amountStr != null) {
+            BigDecimal paidAmount = new BigDecimal(amountStr);
+            if (paidAmount.compareTo(payment.getAmountToPay()) < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Paid M-Pesa amount is less than expected payment amount");
+            }
+        }
+        // Payment was successful
+        BigDecimal paymentAmount = payment.getAmountToPay();
+        Loan loan = payment.getLoan();
+        BigDecimal previousBalance = loan.getRemainingBalance();
+        BigDecimal previousTotalPaid = loan.getTotalPayment().subtract(previousBalance);
+        BigDecimal newBalance = previousBalance.subtract(paymentAmount);
+        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment exceeds remaining loan balance");
+        }
+        BigDecimal totalAmountPaid = previousTotalPaid.add(paymentAmount);
+        String receiptNumber = getMetadataValue(callback, "MpesaReceiptNumber");
         // Update payment
         payment.setStatus(PaymentStatus.COMPLETED);
         payment.setMpesaReceiptNumber(receiptNumber);
@@ -334,37 +199,46 @@ public class MpesaServiceImpl implements MpesaService{
         payment.setPreviousTotal(previousTotalPaid);
         payment.setTotalAmountPaid(totalAmountPaid);
         payment.setRemainingBalance(newBalance);
-
         // Update loan
         loan.setRemainingBalance(newBalance);
-
         if (newBalance.compareTo(BigDecimal.ZERO) == 0) {
             loan.setStatus(LoanStatus.COMPLETED);
         }
-
         loanRepository.save(loan);
         loanPaymentRepository.save(payment);
+    }
+    private boolean verifyWithStkQuery(String checkoutRequestId) {
+        String accessToken = getAccessToken();
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String password = generatePassword(timestamp);
+
+        Map<String, Object> queryRequest = new HashMap<>();
+        queryRequest.put("BusinessShortCode", mpesaProperties.getShortcode());
+        queryRequest.put("Password", password);
+        queryRequest.put("Timestamp", timestamp);
+        queryRequest.put("CheckoutRequestID", checkoutRequestId);
+
+        Map response = restClient.post()
+                .uri(stkQueryUrl)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(queryRequest)
+                .retrieve()
+                .body(Map.class);
+
+        return response != null && "0".equals(String.valueOf(response.get("ResultCode")));
     }
     private String getMetadataValue(
             MpesaCallbackRequest.StkCallback callback,
             String name) {
-
-        if (callback.getCallbackMetadata() == null ||
-                callback.getCallbackMetadata().getItems() == null) {
-
+        if (callback.getCallbackMetadata() == null || callback.getCallbackMetadata().getItems() == null) {
             return null;
         }
-
-        for (MpesaCallbackRequest.CallbackItem item :
-                callback.getCallbackMetadata().getItems()) {
-
+        for (MpesaCallbackRequest.CallbackItem item : callback.getCallbackMetadata().getItems()) {
             if (name.equals(item.getName())) {
-
                 return String.valueOf(item.getValue());
             }
         }
-
         return null;
     }
 }
-

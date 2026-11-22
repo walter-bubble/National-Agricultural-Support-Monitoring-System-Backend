@@ -7,6 +7,8 @@ import com.Farm.NASMS.enums.ProductStatus;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.model.MarketPlaceProduct;
 import com.Farm.NASMS.security.AuthenticatedUserService;
+import com.walter.toolkit.security_starter.audit.Auditable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,14 +17,16 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 @Service
 public class MarketPlaceProductServiceImpl implements MarketPlaceProductService{
-    private AuthenticatedUserService authenticatedUserService;
-    private MarketPlaceProductRepository marketPlaceProductRepository;
+    private final AuthenticatedUserService authenticatedUserService;
+    private final MarketPlaceProductRepository marketPlaceProductRepository;
     public MarketPlaceProductServiceImpl(AuthenticatedUserService authenticatedUserService,MarketPlaceProductRepository marketPlaceProductRepository){
         this.authenticatedUserService=authenticatedUserService;
         this.marketPlaceProductRepository=marketPlaceProductRepository;
     }
     @Override
     @Transactional
+    @PreAuthorize("hasRole('FARMER')")
+    @Auditable(action = "MARKETPLACE_PRODUCT_CREATED")
     public ProductResponse createProduct(CreateProductRequest request) {
         Farmer seller = authenticatedUserService.getCurrentFarmer();
         MarketPlaceProduct product = new MarketPlaceProduct();
@@ -55,6 +59,7 @@ public class MarketPlaceProductServiceImpl implements MarketPlaceProductService{
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('FARMER')")
     public List<ProductResponse> getMyProducts() {
         Farmer seller = authenticatedUserService.getCurrentFarmer();
         return marketPlaceProductRepository.findBySeller_IdOrderByCreatedAtDesc(seller.getId())
@@ -65,6 +70,8 @@ public class MarketPlaceProductServiceImpl implements MarketPlaceProductService{
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('FARMER')")
+    @Auditable(action = "MARKETPLACE_PRODUCT_UPDATED")
     public ProductResponse updateProducts(Long id, CreateProductRequest request) {
         Farmer currentFarmer = authenticatedUserService.getCurrentFarmer();
         MarketPlaceProduct product = marketPlaceProductRepository.findById(id)
@@ -83,6 +90,8 @@ public class MarketPlaceProductServiceImpl implements MarketPlaceProductService{
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('FARMER')")
+    @Auditable(action = "MARKETPLACE_PRODUCT_DEACTIVATED")
     public void deleteProduct(Long id) {
         Farmer currentFarmer = authenticatedUserService.getCurrentFarmer();
         MarketPlaceProduct product = marketPlaceProductRepository.findById(id)

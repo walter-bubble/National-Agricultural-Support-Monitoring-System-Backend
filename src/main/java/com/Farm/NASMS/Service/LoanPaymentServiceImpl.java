@@ -9,8 +9,10 @@ import com.Farm.NASMS.Repository.LoanRepository;
 import com.Farm.NASMS.dto.LoanPaymentRequest;
 import com.Farm.NASMS.dto.LoanPaymentResponse;
 import com.Farm.NASMS.security.AuthenticatedUserService;
+import com.walter.toolkit.security_starter.audit.Auditable;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.server.ResponseStatusException;
@@ -30,6 +32,8 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
     }
     @Override
     @Transactional
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
+    @Auditable(action = "MANUAL_LOAN_PAYMENT_RECORDED")
     public LoanPaymentResponse makePayment(Long id, LoanPaymentRequest request) {
         Loan loan = loanRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Loan does not exist"));
@@ -39,7 +43,7 @@ public class LoanPaymentServiceImpl implements LoanPaymentService {
 
         BigDecimal amount = request.getAmountToPay();
         PaymentMethod paymentMethod = request.getPaymentMethod();
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"amount to pay can't be zero!");
         }
         if (loan.getRemainingBalance().compareTo(BigDecimal.ZERO) <= 0) {

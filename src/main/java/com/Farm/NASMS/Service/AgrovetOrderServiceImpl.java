@@ -9,6 +9,7 @@ import com.Farm.NASMS.dto.AgrovetOrderResponseDTO;
 import com.Farm.NASMS.enums.AgrovetOrderStatus;
 import com.Farm.NASMS.enums.FarmerInputRequestStatus;
 import com.Farm.NASMS.model.*;
+import com.walter.toolkit.security_starter.audit.Auditable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -99,12 +100,14 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
 
     @Override
     @Transactional
+    @Auditable(action = "AGROVET_ORDER_APPROVED")
     public void approveOrder(Long orderId) {
         reviewOrder(orderId, AgrovetOrderStatus.APPROVED);
     }
 
     @Override
     @Transactional
+    @Auditable(action = "AGROVET_ORDER_REJECTED")
     public void rejectOrder(Long orderId) {
         reviewOrder(orderId, AgrovetOrderStatus.REJECTED);
     }
@@ -126,6 +129,7 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
 
     @Override
     @Transactional
+    @Auditable(action = "AGROVET_ORDER_FULFILLED")
     public void fulfillOrder(Long orderId) {
         Agrovet agrovet = getCurrentAgrovet();
         // Lock the order so it cannot be fulfilled twice simultaneously.
@@ -236,6 +240,7 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
     }
     @Override
     @Transactional
+    @Auditable(action = "AGROVET_ORDER_CANCELED")
     public void cancelOrder(Long orderId, String reason) {
         Agrovet agrovet = getCurrentAgrovet();
         AgrovetOrder order = orderRepository.findByAgrovet_IdAndId(agrovet.getId(), orderId)
@@ -257,7 +262,7 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending or approved orders can be canceled");
         }
         order.setStatus(AgrovetOrderStatus.CANCELED);
-        order.setCancellationReason(reason.trim());
+        order.setCancellationReason(reason != null ? reason.trim() : null);
         orderRepository.save(order);
         updateFarmerRequestStatus(order.getFarmerInputRequest());
     }

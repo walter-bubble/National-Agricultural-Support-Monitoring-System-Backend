@@ -27,20 +27,18 @@ public class LoanController {
             return loanService.createLoanFromPackage(nationalId,id);
         }
         //get list of loans
-        @PreAuthorize("hasRole('ADMIN')")
         @GetMapping
-    public List<Loan> getAllLoans(){
+    public List<LoanResponse> getAllLoans(){
         return loanService.getAllLoans();
         }
         //select loan
         @GetMapping("/{id}")
-    public Loan getLoansById(@PathVariable Long id){
-        Loan loan = loanService.getLoansById(id);
-        return loan;
+    public LoanResponse getLoansById(@PathVariable Long id){
+            return loanService.getLoansById(id);
         }
         //get the loan
     @GetMapping("/farmer/{nationalId}")
-    public List<Loan> getLoansByFarmerNationalId(@PathVariable Long nationalId, @RequestParam(required = false) String status) {
+    public List<LoanResponse> getLoansByFarmerNationalId(@PathVariable Long nationalId, @RequestParam(required = false) String status) {
         if (status == null) {
             return loanService.getLoansByFarmer(nationalId, null);
         } else {
@@ -50,7 +48,6 @@ public class LoanController {
     //delete loan
     @DeleteMapping("/{id}")
     public void deleteLoan(@PathVariable Long id){
-        Loan loan = loanService.getLoansById(id);
         loanService.deleteLoan(id);
     }
 }

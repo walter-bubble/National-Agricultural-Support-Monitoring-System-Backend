@@ -4,6 +4,9 @@ import com.Farm.NASMS.Service.AuthService;
 import com.Farm.NASMS.dto.FarmerRegistrationRequest;
 import com.Farm.NASMS.dto.LoginRequest;
 import com.Farm.NASMS.dto.UserResponse;
+import com.Farm.NASMS.model.Farmer;
+import org.springframework.http.HttpStatus;
+import com.walter.toolkit.security_starter.dto.AuthResponse;
 import com.Farm.NASMS.model.User;
 
 import com.Farm.NASMS.security.AuthenticatedUserService;
@@ -28,25 +31,15 @@ public class AuthController {
     }
     //register
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody FarmerRegistrationRequest request){
-        try{
-        UserResponse response=authService.register(request);
-        return ResponseEntity.ok(response);
-        }
-    catch(RuntimeException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody FarmerRegistrationRequest request){
+        UserResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     //login
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest LgRequest){
-        try {
-            String token = authService.login(LgRequest.getEmailAddress(), LgRequest.getPassword());
-            return ResponseEntity.ok(token);
-        }
-        catch(RuntimeException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
+    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody LoginRequest lgRequest) { // <--- CHANGED (added @Valid & AuthResponse)
+        String token = authService.login(lgRequest.getEmailAddress(), lgRequest.getPassword());
+        return ResponseEntity.ok(new AuthResponse(token, "Bearer")); // <--- CHANGED
     }
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
@@ -56,6 +49,11 @@ public class AuthController {
         response.setUserName(currentUser.getUserName());
         response.setEmailAddress(currentUser.getEmailAddress());
         response.setRole(currentUser.getRole());
+        if ("FARMER".equalsIgnoreCase(currentUser.getRole())) {
+            Farmer farmer = authenticatedUserService.getCurrentFarmer();
+            response.setFarmerId(farmer.getId());
+            response.setNationalId(farmer.getNationalId());
+        }
         return ResponseEntity.ok(response);
     }
 }

@@ -5,6 +5,8 @@ public class UserResponse {
     private String userName;
     private String emailAddress;
     private String role;
+    private Long farmerId;
+    private Long nationalId;
 
     public Long getId() {
         return id;
@@ -38,4 +40,19 @@ public class UserResponse {
         this.role = role;
     }
 
+    public Long getFarmerId() {
+        return farmerId;
+    }
+
+    public void setFarmerId(Long farmerId) {
+        this.farmerId = farmerId;
+    }
+
+    public Long getNationalId() {
+        return nationalId;
+    }
+
+    public void setNationalId(Long nationalId) {
+        this.nationalId = nationalId;
+    }
 }

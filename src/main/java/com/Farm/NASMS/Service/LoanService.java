@@ -6,12 +6,9 @@ import com.Farm.NASMS.model.Loan;
 import java.util.List;
 
 public interface LoanService {
-
-    List<Loan> getAllLoans();
-    Loan getLoansById(Long id);
-    List<Loan>getLoansByFarmer(Long nationalId,String status);
+    List<LoanResponse> getAllLoans();
+    LoanResponse getLoansById(Long id);
+    List<LoanResponse>getLoansByFarmer(Long nationalId,String status);
     void deleteLoan(Long id);
-
-
     LoanResponse createLoanFromPackage(Long nationalId, Long id);
 }

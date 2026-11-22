@@ -11,6 +11,7 @@ import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
 import com.Farm.NASMS.security.AuthenticatedUserService;
+import com.walter.toolkit.security_starter.audit.Auditable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -36,16 +37,18 @@ public class LoanServiceImpl implements LoanService {
         this.farmingSeasonRepository=farmingSeasonRepository;
     }
     @Override
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
+    @Auditable(action = "LOAN_CREATED")
     public LoanResponse createLoanFromPackage(Long nationalId, Long id) {
         if(!authenticatedUserService.isCurrentFarmerNationalId(nationalId)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied");
         }
         Farmer farmer = farmerRepository.findByNationalId(nationalId)
-                .orElseThrow(()->new RuntimeException("Farmer not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Farmer not found"));
         FarmingSeason season = farmingSeasonRepository.findActiveSeason()
-                .orElseThrow(() -> new RuntimeException("No active season found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No active season found!"));
         LoanPackage loanPackage=loanPackageRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("loan package not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan package not found"));
 
         // closing of season
         if(season.shouldAutoClose()) {
@@ -54,27 +57,19 @@ public class LoanServiceImpl implements LoanService {
         }
         //if season is still active
         if(!season.isActive()){
-            throw new RuntimeException("Loans can only be applied during active season");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loans can only be applied during an active season");
         }
         //check if loan limit has been exceeded for that season
-        Double totalLoanAmount =
-                loanRepository.getTotalLoanAmountBySeason(season.getId());
-
-        BigDecimal totalLoans =
-                totalLoanAmount == null
-                        ? BigDecimal.ZERO
-                        : BigDecimal.valueOf(totalLoanAmount);
-
-        BigDecimal newTotalLoans =
-                totalLoans.add(loanPackage.getAmount());
-
+        Double totalLoanAmount = loanRepository.getTotalLoanAmountBySeason(season.getId());
+        BigDecimal totalLoans = totalLoanAmount == null ? BigDecimal.ZERO : BigDecimal.valueOf(totalLoanAmount);
+        BigDecimal newTotalLoans = totalLoans.add(loanPackage.getAmount());
         if (newTotalLoans.compareTo(season.getBudget()) > 0) {
-            throw new RuntimeException("Season budget exceeded!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Season budget exceeded!");
         }
         //check if farmer has a lona already
         boolean hasActiveLoan = loanRepository.existsByFarmerAndStatusIn(farmer,List.of(LoanStatus.ACTIVE));
         if(hasActiveLoan){
-            throw new RuntimeException("You already have a loan!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have an active loan!");
         }
         Loan loan = new Loan();
         loan.setFarmer(farmer);
@@ -85,34 +80,21 @@ public class LoanServiceImpl implements LoanService {
         loan.setMonthlyPenalty(loanPackage.getMonthlyPenalty());
        loan.setDurationMonths(loanPackage.getDurationMonths());
 
-
        LocalDateTime now = LocalDateTime.now();
-       LocalDateTime dueDate = now
-               .plusMonths(loan.getDurationMonths());
+       LocalDateTime dueDate = now.plusMonths(loan.getDurationMonths());
        loan.setDueDate(dueDate);
         BigDecimal time = BigDecimal.valueOf(loanPackage.getDurationMonths())
                 .divide(BigDecimal.valueOf(12), 4, RoundingMode.HALF_UP);
-
-        BigDecimal interest = loanPackage.getAmount()
-                .multiply(
-                        loanPackage.getInterestRate()
-                                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)
-                )
-                .multiply(time);
-
-        BigDecimal totalPayment = loanPackage.getAmount()
-                .add(interest);
-
+        BigDecimal interest = loanPackage.getAmount().multiply(loanPackage.getInterestRate()
+                                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)).multiply(time);
+        BigDecimal totalPayment = loanPackage.getAmount().add(interest);
         loan.setTotalPayment(totalPayment);
         loan.setRemainingBalance(totalPayment);
         loan.setStatus(LoanStatus.ACTIVE);
-
         Loan savedLoan = loanRepository.save(loan);
-
         LoanResponse response = getLoanResponse(savedLoan);
         return response;
     }
-
     private static LoanResponse getLoanResponse(Loan savedLoan) {
         LoanResponse response = new LoanResponse();
         response.setLoanId(savedLoan.getId());
@@ -126,39 +108,46 @@ public class LoanServiceImpl implements LoanService {
         response.setInterestRate(savedLoan.getInterestRate().doubleValue());
         return response;
     }
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<LoanResponse> getAllLoans() {
+        return loanRepository.findAll()
+                .stream()
+                .map(LoanServiceImpl::getLoanResponse)
+                .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
+    public LoanResponse getLoansById(Long id) {
+        Loan loan = loanRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan Not Found"));
+        if (!authenticatedUserService.isLoanOwner(loan) && !authenticatedUserService.isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        return getLoanResponse(loan);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
+    public List<LoanResponse> getLoansByFarmer(Long nationalId, String status) {
+        if (!authenticatedUserService.isCurrentFarmerNationalId(nationalId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        List<Loan> loans = (status == null)
+                ? loanRepository.findByFarmerNationalId(nationalId)
+                : loanRepository.findByFarmerNationalIdAndStatus(nationalId, LoanStatus.valueOf(status.toUpperCase()));
+        return loans.stream()
+                .map(LoanServiceImpl::getLoanResponse)
+                .toList();
+    }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public List<Loan> getAllLoans() {
-        return loanRepository.findAll();
-    }
-
-    @Override
-    public Loan getLoansById(Long id) {
-        Loan loan = loanRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Loan Not Found"));
-        if(!authenticatedUserService.isLoanOwner(loan) && !authenticatedUserService.isAdmin()){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied");
-        }
-        return loan;
-    }
-    @Override
-    public List<Loan> getLoansByFarmer(Long nationalId,String status) {
-        if(!authenticatedUserService.isCurrentFarmerNationalId(nationalId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied");
-        }
-
-        if(status==null){
-            return loanRepository.findByFarmerNationalId(nationalId);
-        }
-        return loanRepository.findByFarmerNationalIdAndStatus(nationalId,LoanStatus.valueOf(status.toUpperCase()));
-    }
-    @Override
+    @Auditable(action = "LOAN_DELETED")
     public void deleteLoan(Long id) {
-        if(!authenticatedUserService.isAdmin()){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access Denied");
-        }
-        //check if loan exists
-        Loan loan = getLoansById(id);
+        Loan loan = loanRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan Not Found"));
         loanRepository.delete(loan);
     }
 }

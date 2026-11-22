@@ -10,6 +10,7 @@ import com.Farm.NASMS.enums.AgrovetStatus;
 import com.Farm.NASMS.enums.FarmerInputRequestStatus;
 import com.Farm.NASMS.model.*;
 import com.Farm.NASMS.security.AuthenticatedUserService;
+import com.walter.toolkit.security_starter.audit.Auditable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,8 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('FARMER')")
+    @Auditable(action = "INPUT_REQUEST_SUBMITTED")
     public Long createRequest(FarmerInputRequestCreateDTO requestDto) {
         if (!authenticatedUserService.isFarmer()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only farmers can submit input requests");
@@ -49,8 +52,7 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
         request.setFarmer(farmer);
         request.setStatus(FarmerInputRequestStatus.SUBMITTED);
         for (FarmerInputRequestItemDTO itemDTO : requestDto.items()) {
-            AgrovetProducts product = productRepository
-                    .findById(itemDTO.agrovetProductId())
+            AgrovetProducts product = productRepository.findById(itemDTO.agrovetProductId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected product was not found"));
             if (!product.isActive()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The selected product is not active");
@@ -63,8 +65,7 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The selected product does not belong to the chosen Agrovet");
             }
             BigDecimal quantity = itemDTO.quantity();
-            if (quantity == null
-                    || quantity.compareTo(BigDecimal.ZERO) <= 0) {
+            if (quantity == null || quantity.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested quantity must be greater than zero");
             }
             if (product.getQuantityAvailable().compareTo(quantity) < 0) {
@@ -85,14 +86,14 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
     }
     @Override
     @Transactional
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "INPUT_REQUEST_REVIEWED")
     public void reviewRequest(Long requestId, FarmerInputRequestReviewDTO reviewDTO) {
         if (!authenticatedUserService.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrators can review input requests");
         }
         FarmerInputRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Input request not found"));
-
         if (request.getStatus() != FarmerInputRequestStatus.SUBMITTED && request.getStatus() != FarmerInputRequestStatus.UNDER_REVIEW) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only submitted or under-review requests can be reviewed");
         }
@@ -105,42 +106,32 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
     }
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "INPUT_REQUEST_FORWARDED")
     public Long forwardRequest(Long requestId) {
-
         if (!authenticatedUserService.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrators can forward input requests");
         }
         FarmerInputRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Input request not found"));
-
         if (request.getStatus() != FarmerInputRequestStatus.APPROVED) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Only approved input requests can be forwarded"
-            );
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only approved input requests can be forwarded");
         }
-
         if (request.getItems() == null || request.getItems().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot forward a request without items");
         }
-
         // Do not create duplicate orders for this request.
         if (!orderRepository.findByFarmerInputRequest_Id(requestId).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Orders already exist for this request");
         }
-
         // Group request items by their selected Agrovet.
         Map<Long, List<FarmerInputRequestItem>> itemsByAgrovet = new LinkedHashMap<>();
-
         for (FarmerInputRequestItem item : request.getItems()) {
-
             if (item.getPreferredAgrovet() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A requested item has no selected Agrovet");
             }
             Long agrovetId = item.getPreferredAgrovet().getId();
-            itemsByAgrovet
-                    .computeIfAbsent(agrovetId, key -> new ArrayList<>())
-                    .add(item);
+            itemsByAgrovet.computeIfAbsent(agrovetId, key -> new ArrayList<>()).add(item);
         }
         // Create one order for each selected Agrovet.
         for (List<FarmerInputRequestItem> items : itemsByAgrovet.values()) {
@@ -154,19 +145,15 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
             for (FarmerInputRequestItem requestItem : items) {
                 AgrovetProducts product = requestItem.getSelectedProduct();
                 BigDecimal quantity = requestItem.getRequestedQuantity();
-
                 // Recheck current stock before forwarding.
-                if (!product.isActive()
-                        || product.getQuantityAvailable().compareTo(quantity) < 0) {
+                if (!product.isActive() || product.getQuantityAvailable().compareTo(quantity) < 0) {
                     throw new ResponseStatusException(HttpStatus.CONFLICT, "Product is inactive or has insufficient stock: " + product.getProductName());
                 }
                 BigDecimal unitPrice = product.getPrice();
                 if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid price for product: " + product.getProductName());
                 }
-                BigDecimal subtotal = unitPrice
-                        .multiply(quantity)
-                        .setScale(2, RoundingMode.HALF_UP);
+                BigDecimal subtotal = unitPrice.multiply(quantity).setScale(2, RoundingMode.HALF_UP);
                 AgrovetOrderItem orderItem = new AgrovetOrderItem();
                 orderItem.setAgrovetOrder(order);
                 orderItem.setRequestItem(requestItem);
@@ -188,7 +175,6 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public List<FarmerInputRequestResponseDTO> getAllRequests() {
-
         return requestRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::mapToResponseDTO)
@@ -199,16 +185,10 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")
     public FarmerInputRequestResponseDTO getRequestById(Long requestId) {
-
         FarmerInputRequest request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Input request not found"
-                ));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Input request not found"));
         return mapToResponseDTO(request);
     }
-
     private FarmerInputRequestResponseDTO mapToResponseDTO(
             FarmerInputRequest request) {
         List<FarmerInputRequestItemResponseDTO> items =
@@ -233,4 +213,3 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
         );
     }
 }
-
