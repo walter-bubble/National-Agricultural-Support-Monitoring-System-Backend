@@ -2,6 +2,7 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.dto.LoanResponse;
 import com.Farm.NASMS.enums.LoanStatus;
+import com.Farm.NASMS.enums.LoanType;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.model.Loan;
@@ -67,7 +68,7 @@ public class LoanServiceImpl implements LoanService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Season budget exceeded!");
         }
         //check if farmer has a lona already
-        boolean hasActiveLoan = loanRepository.existsByFarmerAndStatusIn(farmer,List.of(LoanStatus.ACTIVE));
+        boolean hasActiveLoan = loanRepository.existsByFarmerAndLoanTypeAndStatusIn(farmer, LoanType.CASH_LOAN, List.of(LoanStatus.ACTIVE));
         if(hasActiveLoan){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have an active loan!");
         }
@@ -102,10 +103,13 @@ public class LoanServiceImpl implements LoanService {
         response.setDueDate(savedLoan.getDueDate());
         response.setFarmerName(savedLoan.getFarmer().getName());
         response.setTotalPayment(savedLoan.getTotalPayment());
+        response.setRemainingBalance(savedLoan.getRemainingBalance());
         response.setSeasonName(savedLoan.getFarmingSeason().getSeasonName());
         response.setStatus(savedLoan.getStatus());
         response.setNationalId(savedLoan.getFarmer().getNationalId());
         response.setInterestRate(savedLoan.getInterestRate().doubleValue());
+        response.setLoanType(savedLoan.getLoanType());
+        response.setAgrovetOrderId(savedLoan.getAgrovetOrder() != null ? savedLoan.getAgrovetOrder().getId() : null);
         return response;
     }
     @Override

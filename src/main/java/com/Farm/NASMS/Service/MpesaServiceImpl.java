@@ -3,6 +3,7 @@ package com.Farm.NASMS.Service;
 import com.Farm.NASMS.Config.MpesaProperties;
 import com.Farm.NASMS.Repository.LoanPaymentRepository;
 import com.Farm.NASMS.Repository.LoanRepository;
+import com.Farm.NASMS.dto.LoanPaymentResponse;
 import com.Farm.NASMS.dto.MpesaCallbackRequest;
 import com.Farm.NASMS.dto.MpesaStkRequest;
 import com.Farm.NASMS.dto.MpesaStkResponse;
@@ -28,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -240,5 +242,37 @@ public class MpesaServiceImpl implements MpesaService{
             }
         }
         return null;
+    }
+    @Override
+    public LoanPaymentResponse getPaymentStatus(String checkoutRequestId) {
+        LoanPayment payment = loanPaymentRepository.findByCheckoutRequestId(checkoutRequestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment record not found"));
+        if (!authenticatedUserService.isAdmin() && !authenticatedUserService.isLoanOwner(payment.getLoan())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        return mapToPaymentResponse(payment);
+    }
+
+    @Override
+    public List<LoanPaymentResponse> getPaymentsByLoan(Long loanId) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan does not exist"));
+        if (!authenticatedUserService.isAdmin() && !authenticatedUserService.isLoanOwner(loan)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        return loanPaymentRepository.findByLoan(loan).stream()
+                .map(this::mapToPaymentResponse)
+                .toList();
+    }
+    private LoanPaymentResponse mapToPaymentResponse(LoanPayment payment) {
+        LoanPaymentResponse response = new LoanPaymentResponse();
+        response.setAmountToPay(payment.getAmountToPay());
+        response.setTotalAmountPaid(payment.getTotalAmountPaid());
+        response.setRemainingBalance(payment.getRemainingBalance());
+        response.setPaymentDate(payment.getPaymentDate());
+        response.setTransactionCode(payment.getTransactionCode());
+        response.setPaymentMethod(payment.getPaymentMethod());
+        response.setStatus(payment.getStatus());
+        return response;
     }
 }

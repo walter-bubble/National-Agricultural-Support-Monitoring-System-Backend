@@ -52,7 +52,7 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
         request.setFarmer(farmer);
         request.setStatus(FarmerInputRequestStatus.SUBMITTED);
         for (FarmerInputRequestItemDTO itemDTO : requestDto.items()) {
-            AgrovetProducts product = productRepository.findById(itemDTO.agrovetProductId())
+            AgrovetProducts product = productRepository.findByIdForUpdate(itemDTO.agrovetProductId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected product was not found"));
             if (!product.isActive()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The selected product is not active");
@@ -71,6 +71,11 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
             if (product.getQuantityAvailable().compareTo(quantity) < 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient stock for " + product.getProductName());
             }
+
+            // Deduct/reserve stock immediately when the farmer places the order
+            product.setQuantityAvailable(product.getQuantityAvailable().subtract(quantity));
+            productRepository.save(product);
+
             FarmerInputRequestItem item = new FarmerInputRequestItem();
             item.setFarmerInputRequest(request);
             item.setSelectedProduct(product);
@@ -101,6 +106,12 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
             request.setStatus(FarmerInputRequestStatus.APPROVED);
         } else {
             request.setStatus(FarmerInputRequestStatus.REJECTED);
+        }
+        for (FarmerInputRequestItem item : request.getItems()) {
+            AgrovetProducts product = productRepository.findByIdForUpdate(item.getSelectedProduct().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected product was not found"));
+            product.setQuantityAvailable(product.getQuantityAvailable().add(item.getRequestedQuantity()));
+            productRepository.save(product);
         }
         requestRepository.save(request);
     }
@@ -146,8 +157,8 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
                 AgrovetProducts product = requestItem.getSelectedProduct();
                 BigDecimal quantity = requestItem.getRequestedQuantity();
                 // Recheck current stock before forwarding.
-                if (!product.isActive() || product.getQuantityAvailable().compareTo(quantity) < 0) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Product is inactive or has insufficient stock: " + product.getProductName());
+                if (!product.isActive()) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Product is inactive: " + product.getProductName());
                 }
                 BigDecimal unitPrice = product.getPrice();
                 if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
@@ -188,6 +199,18 @@ public class FarmerInputRequestServiceImpl implements FarmerInputRequestService 
         FarmerInputRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Input request not found"));
         return mapToResponseDTO(request);
+    }
+    @Override
+    @PreAuthorize("hasRole('FARMER')")
+    public List<FarmerInputRequestResponseDTO> getMyRequests() {
+        if (!authenticatedUserService.isFarmer()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only farmers can view their input requests");
+        }
+        Farmer farmer = authenticatedUserService.getCurrentFarmer();
+        return requestRepository.findByFarmerOrderByCreatedAtDesc(farmer)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
     private FarmerInputRequestResponseDTO mapToResponseDTO(
             FarmerInputRequest request) {

@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +55,6 @@ public class ProduceOrderNServiceImpl implements ProduceOrderNService {
                 .status(ProductOrderStatusN.PENDING)
                 .build();
         ProduceDeliveryN savedOrder = produceOrderNRepo.save(deliveryN);
-
         return toResponse(savedOrder);
     }
 
@@ -73,6 +73,31 @@ public class ProduceOrderNServiceImpl implements ProduceOrderNService {
                 .map(this::toResponse)
                 .toList();
     }
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ProduceDeliveryResponseN> getAllOrders() {
+        return produceOrderNRepo.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Auditable(action = "PRODUCE_ORDER_SCHEDULED")
+    public ProduceDeliveryResponseN scheduleOrder(Long orderId, LocalDate scheduledDate) {
+        if (scheduledDate == null || scheduledDate.isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scheduled date must be today or in the future");
+        }
+        ProduceDeliveryN order = produceOrderNRepo.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produce order not found"));
+
+        order.setScheduledDate(scheduledDate);
+        order.setStatus(ProductOrderStatusN.SCHEDULED);
+
+        ProduceDeliveryN saved = produceOrderNRepo.save(order);
+        return toResponse(saved);
+    }
+
     private ProduceDeliveryResponseN toResponse(ProduceDeliveryN order) {
         return new ProduceDeliveryResponseN(
                 order.getId(),

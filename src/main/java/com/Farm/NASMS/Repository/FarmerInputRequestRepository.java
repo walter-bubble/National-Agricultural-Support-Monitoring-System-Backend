@@ -1,6 +1,7 @@
 package com.Farm.NASMS.Repository;
 
 import com.Farm.NASMS.enums.FarmerInputRequestStatus;
+import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.model.FarmerInputRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,5 @@ public interface FarmerInputRequestRepository extends JpaRepository<FarmerInputR
     List<FarmerInputRequest> findByStatus(FarmerInputRequestStatus status);
     List<FarmerInputRequest> findAllByOrderByCreatedAtDesc();
     Optional<FarmerInputRequest> findById(Long id);
+    List<FarmerInputRequest> findByFarmerOrderByCreatedAtDesc(Farmer farmer);
 }

@@ -1,6 +1,7 @@
 package com.Farm.NASMS.dto;
 
 import com.Farm.NASMS.enums.PaymentMethod;
+import com.Farm.NASMS.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ public class LoanPaymentResponse {
     private PaymentMethod paymentMethod;
     private String transactionCode;
     private LocalDateTime paymentDate;
+    private PaymentStatus status;
 
 
     public BigDecimal getAmountToPay() {
@@ -60,6 +62,14 @@ public class LoanPaymentResponse {
 
     public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
     }
 }
 

@@ -2,6 +2,7 @@ package com.Farm.NASMS.Service;
 
 import com.Farm.NASMS.Repository.FarmingSeasonRepository;
 import com.Farm.NASMS.Repository.LoanPackageRepository;
+import com.Farm.NASMS.dto.LoanPackageResponse;
 import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.model.LoanPackage;
 import com.walter.toolkit.security_starter.audit.Auditable;
@@ -23,9 +24,8 @@ public class LoanPackageServiceImpl implements LoanPackageService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     @Auditable(action = "LOAN_PACKAGE_CREATED")
-    public LoanPackage createLoanPackage(LoanPackage loanPackage) {
-        FarmingSeason activeSeason = farmingSeasonRepository
-                .findActiveSeason()
+    public LoanPackageResponse createLoanPackage(LoanPackage loanPackage) {
+        FarmingSeason activeSeason = farmingSeasonRepository.findActiveSeason()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No active season found"));
         BigDecimal seasonBudget = activeSeason.getBudget();
         BigDecimal allocatedAmount = loanPackageRepository.sumPackageAmountsByFarmingSeason(activeSeason);
@@ -37,22 +37,26 @@ public class LoanPackageServiceImpl implements LoanPackageService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loan package exceeds the remaining farming season budget. Remaining budget: " + remainingBudget);
         }
         loanPackage.setFarmingSeason(activeSeason);
-        return loanPackageRepository.save(loanPackage);
+        LoanPackage saved = loanPackageRepository.save(loanPackage);
+        return  mapToResponse(saved);
     }
     @Override
-    public List<LoanPackage> getAllLoanPackage() {
-        return loanPackageRepository.findAll();
+    public List<LoanPackageResponse> getAllLoanPackage() {
+        return loanPackageRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
     @Override
-    public LoanPackage getLoanPackageById(Long id) {
-        return loanPackageRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan Package not found!"));
+    public LoanPackageResponse getLoanPackageById(Long id) {
+        LoanPackage existing = findEntityById(id);
+        return mapToResponse(existing);
     }
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     @Auditable(action = "LOAN_PACKAGE_UPDATED")
-    public LoanPackage updateLoanPackage(Long id,LoanPackage loanPackage){
-        LoanPackage existing = getLoanPackageById(id);
+    public LoanPackageResponse updateLoanPackage(Long id,LoanPackage loanPackage){
+        LoanPackage existing = findEntityById(id);
         existing.setAmount(loanPackage.getAmount());
         existing.setInterestRate(loanPackage.getInterestRate());
         existing.setDurationMonths(loanPackage.getDurationMonths());
@@ -60,13 +64,35 @@ public class LoanPackageServiceImpl implements LoanPackageService {
         existing.setDescription(loanPackage.getDescription());
         existing.setMinimumFarmSize(loanPackage.getMinimumFarmSize());
         existing.setMaximumFarmSize(loanPackage.getMaximumFarmSize());
-        return loanPackageRepository.save(existing);
+        LoanPackage saved = loanPackageRepository.save(existing);
+        return mapToResponse(saved);
     }
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     @Auditable(action = "LOAN_PACKAGE_DELETED")
     public void deleteLoanPackage(Long id) {
-        LoanPackage existing=getLoanPackageById(id);
+        LoanPackage existing=findEntityById(id);
         loanPackageRepository.delete(existing);
+    }
+    private LoanPackage findEntityById(Long id) {
+        return loanPackageRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan Package not found!"));
+    }
+    private LoanPackageResponse mapToResponse(LoanPackage pkg) {
+        FarmingSeason season = pkg.getFarmingSeason();
+        return new LoanPackageResponse(
+                pkg.getId(),
+                pkg.getAmount(),
+                pkg.getInterestRate(),
+                pkg.getDurationMonths(),
+                pkg.getMonthlyPenalty(),
+                pkg.getDescription(),
+                pkg.getMinimumFarmSize(),
+                pkg.getMaximumFarmSize(),
+                season != null ? season.getId() : null,
+                season != null ? season.getSeasonName() : null,
+                season != null ? season.getStartDate() : null,
+                season != null ? season.getEndDate() : null
+        );
     }
 }

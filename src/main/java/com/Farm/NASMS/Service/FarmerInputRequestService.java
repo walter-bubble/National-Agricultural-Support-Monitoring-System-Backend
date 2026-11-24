@@ -12,4 +12,5 @@ public interface FarmerInputRequestService {
     Long forwardRequest(Long requestId);
     List<FarmerInputRequestResponseDTO> getAllRequests();
     FarmerInputRequestResponseDTO getRequestById(Long requestId);
+    List<FarmerInputRequestResponseDTO> getMyRequests();
 }

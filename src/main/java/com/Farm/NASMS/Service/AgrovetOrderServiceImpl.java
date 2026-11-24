@@ -1,13 +1,12 @@
 package com.Farm.NASMS.Service;
 
-import com.Farm.NASMS.Repository.AgrovetOrderRepository;
-import com.Farm.NASMS.Repository.AgrovetProductRepository;
-import com.Farm.NASMS.Repository.AgrovetRepository;
-import com.Farm.NASMS.Repository.FarmerInputRequestRepository;
+import com.Farm.NASMS.Repository.*;
 import com.Farm.NASMS.dto.AgrovetOrderItemResponseDTO;
 import com.Farm.NASMS.dto.AgrovetOrderResponseDTO;
 import com.Farm.NASMS.enums.AgrovetOrderStatus;
 import com.Farm.NASMS.enums.FarmerInputRequestStatus;
+import com.Farm.NASMS.enums.LoanStatus;
+import com.Farm.NASMS.enums.LoanType;
 import com.Farm.NASMS.model.*;
 import com.walter.toolkit.security_starter.audit.Auditable;
 import org.springframework.http.HttpStatus;
@@ -19,6 +18,7 @@ import com.Farm.NASMS.model.AgrovetProducts;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,12 +31,16 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
     private final AgrovetRepository agrovetRepository;
     private final FarmerInputRequestRepository requestRepository;
     private final AgrovetProductRepository productRepository;
+    private final LoanRepository loanRepository;
+    private final FarmingSeasonRepository farmingSeasonRepository;
 
-    public AgrovetOrderServiceImpl(AgrovetOrderRepository orderRepository, AgrovetRepository agrovetRepository, FarmerInputRequestRepository requestRepository, AgrovetProductRepository productRepository) {
+    public AgrovetOrderServiceImpl(AgrovetOrderRepository orderRepository, AgrovetRepository agrovetRepository, FarmerInputRequestRepository requestRepository, AgrovetProductRepository productRepository, LoanRepository loanRepository, FarmingSeasonRepository farmingSeasonRepository) {
         this.orderRepository = orderRepository;
         this.agrovetRepository = agrovetRepository;
         this.requestRepository = requestRepository;
         this.productRepository = productRepository;
+        this.loanRepository = loanRepository;
+        this.farmingSeasonRepository = farmingSeasonRepository;
     }
 
     private Agrovet getCurrentAgrovet() {
@@ -74,9 +78,16 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
                 .stream()
                 .map(this::toItemResponseDTO)
                 .toList();
+        Farmer farmer = order.getFarmerInputRequest() != null
+                ? order.getFarmerInputRequest().getFarmer()
+                : null;
+        String farmerName = farmer != null ? farmer.getName() : null;
+        String farmerContact = farmer != null ? farmer.getPhoneNumber() : null;
         return new AgrovetOrderResponseDTO(
                 order.getId(),
                 order.getFarmerInputRequest().getId(),
+                farmerName,
+                farmerContact,
                 order.getStatus().name(),
                 order.getTotalAmount(),
                 order.getForwardedAt(),
@@ -114,13 +125,16 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
 
     private void reviewOrder(Long orderId, AgrovetOrderStatus newStatus) {
         Agrovet agrovet = getCurrentAgrovet();
-        AgrovetOrder order = orderRepository.findByAgrovet_IdAndId(agrovet.getId(), orderId)
+        AgrovetOrder order = orderRepository.findByAgrovetAndIdForUpdate(agrovet.getId(), orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found for this Agrovet"));
         if (order.getForwardedAt() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Forwarded order not found");
         }
         if (order.getStatus() != AgrovetOrderStatus.PENDING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending orders can be reviewed");
+        }
+        if (newStatus == AgrovetOrderStatus.REJECTED) {
+            restoreStockForOrder(order);
         }
         order.setStatus(newStatus);
         orderRepository.save(order);
@@ -142,52 +156,40 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
         if (order.getStatus() != AgrovetOrderStatus.APPROVED) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only approved orders can be fulfilled");
         }
-
-        // Group quantities by product ID. TreeMap sorts IDs to keep
-        // product locks in a consistent order and reduce deadlock risk.
-        Map<Long, BigDecimal> requiredQuantities = new TreeMap<>();
-        for (AgrovetOrderItem item : order.getItems()) {
-            Long productId = item.getAgrovetProduct().getId();
-            requiredQuantities.merge(
-                    productId,
-                    item.getQuantity(),
-                    BigDecimal::add
-            );
-        }
-        // Lock all products and validate stock before deducting anything.
-        Map<Long, AgrovetProducts> lockedProducts = new TreeMap<>();
-        for (Map.Entry<Long, BigDecimal> entry : requiredQuantities.entrySet()) {
-            Long productId = entry.getKey();
-            BigDecimal requiredQuantity = entry.getValue();
-            AgrovetProducts product = productRepository.findByIdForUpdate(productId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found: " + productId));
-
-            // Confirm that the product belongs to this Agrovet.
-            if (!product.getAgrovet().getId().equals(agrovet.getId())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot fulfill an order containing another Agrovet's product");
-            }
-
-            if (!product.isActive()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, product.getProductName() + " is inactive");
-            }
-            if (product.getQuantityAvailable().compareTo(requiredQuantity) < 0) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Insufficient stock for " + product.getProductName());
-            }
-            lockedProducts.put(productId, product);
-        }
-        // Deduct stock only after every product has passed validation.
-        for (Map.Entry<Long, BigDecimal> entry : requiredQuantities.entrySet()) {
-            AgrovetProducts product = lockedProducts.get(entry.getKey());
-            BigDecimal remainingStock = product.getQuantityAvailable()
-                    .subtract(entry.getValue());
-            product.setQuantityAvailable(remainingStock);
-            productRepository.save(product);
-        }
         // Update the order after stock deduction.
         order.setStatus(AgrovetOrderStatus.FULFILLED);
         orderRepository.save(order);
+        recordInputLoanForOrder(order);
         // Update the overall farmer request status.
         updateFarmerRequestStatus(order.getFarmerInputRequest());
+    }
+    private void recordInputLoanForOrder(AgrovetOrder order) {
+        if (loanRepository.existsByAgrovetOrder(order)) {
+            return; // Prevent duplicate input loan if already recorded
+        }
+
+        Farmer farmer = order.getFarmerInputRequest().getFarmer();
+        FarmingSeason activeSeason = farmingSeasonRepository.findActiveSeason()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Cannot fulfill input order: no active farming season found to record input loan"));
+
+        Loan inputLoan = new Loan();
+        inputLoan.setFarmer(farmer);
+        inputLoan.setFarmingSeason(activeSeason);
+        inputLoan.setAgrovetOrder(order);
+        inputLoan.setLoanType(LoanType.INPUT_LOAN);
+        inputLoan.setAmount(order.getTotalAmount());
+        inputLoan.setInterestRate(BigDecimal.ZERO);
+        inputLoan.setMonthlyPenalty(BigDecimal.ZERO);
+        inputLoan.setDurationMonths(6);
+        inputLoan.setTotalPayment(order.getTotalAmount());
+        inputLoan.setRemainingBalance(order.getTotalAmount());
+        inputLoan.setDueDate(
+                activeSeason.getEndDate() != null
+                        ? activeSeason.getEndDate().atTime(23, 59)
+                        : LocalDateTime.now().plusMonths(6)
+        );
+        inputLoan.setStatus(LoanStatus.ACTIVE);
+        loanRepository.save(inputLoan);
     }
 
     private void updateFarmerRequestStatus(FarmerInputRequest request) {
@@ -245,15 +247,6 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
         Agrovet agrovet = getCurrentAgrovet();
         AgrovetOrder order = orderRepository.findByAgrovet_IdAndId(agrovet.getId(), orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found for this Agrovet"));
-        System.out.println("========== CANCEL ORDER DEBUG ==========");
-        System.out.println("Order ID: " + order.getId());
-        System.out.println("Agrovet ID: " + order.getAgrovet().getId());
-        System.out.println("Order status: " + order.getStatus());
-        System.out.println("Is PENDING: " +
-                (order.getStatus() == AgrovetOrderStatus.PENDING));
-        System.out.println("Is APPROVED: " +
-                (order.getStatus() == AgrovetOrderStatus.APPROVED));
-        System.out.println("========================================");
         if (order.getForwardedAt() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This order has not been forwarded yet");
         }
@@ -263,7 +256,16 @@ public class AgrovetOrderServiceImpl implements AgrovetOrderService {
         }
         order.setStatus(AgrovetOrderStatus.CANCELED);
         order.setCancellationReason(reason != null ? reason.trim() : null);
+        restoreStockForOrder(order);
         orderRepository.save(order);
         updateFarmerRequestStatus(order.getFarmerInputRequest());
+    }
+    private void restoreStockForOrder(AgrovetOrder order) {
+        for (AgrovetOrderItem item : order.getItems()) {
+            AgrovetProducts product = productRepository.findByIdForUpdate(item.getAgrovetProduct().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+            product.setQuantityAvailable(product.getQuantityAvailable().add(item.getQuantity()));
+            productRepository.save(product);
+        }
     }
 }

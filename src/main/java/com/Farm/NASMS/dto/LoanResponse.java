@@ -1,6 +1,7 @@
 package com.Farm.NASMS.dto;
 
 import com.Farm.NASMS.enums.LoanStatus;
+import com.Farm.NASMS.enums.LoanType;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
         "amount",
         "interestRate",
         "totalPayment",
+        "remainingBalance",
         "dueDate",
         "status"
 })
@@ -24,6 +26,9 @@ public class LoanResponse {
     private BigDecimal amount;
     private double interestRate;
     private BigDecimal totalPayment;
+    private BigDecimal remainingBalance;
+    private LoanType loanType;
+    private Long agrovetOrderId;
     private LoanStatus status;
     private LocalDateTime dueDate;
 
@@ -75,6 +80,14 @@ public class LoanResponse {
         this.totalPayment = totalPayment;
     }
 
+    public BigDecimal getRemainingBalance() {
+        return remainingBalance;
+    }
+
+    public void setRemainingBalance(BigDecimal remainingBalance) {
+        this.remainingBalance = remainingBalance;
+    }
+
     public LoanStatus getStatus() {
         return status;
     }
@@ -97,5 +110,21 @@ public class LoanResponse {
 
     public void setInterestRate(double interestRate) {
         this.interestRate = interestRate;
+    }
+
+    public LoanType getLoanType() {
+        return loanType;
+    }
+
+    public void setLoanType(LoanType loanType) {
+        this.loanType = loanType;
+    }
+
+    public Long getAgrovetOrderId() {
+        return agrovetOrderId;
+    }
+
+    public void setAgrovetOrderId(Long agrovetOrderId) {
+        this.agrovetOrderId = agrovetOrderId;
     }
 }

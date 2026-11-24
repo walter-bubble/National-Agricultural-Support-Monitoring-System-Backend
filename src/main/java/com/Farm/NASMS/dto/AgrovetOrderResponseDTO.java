@@ -6,6 +6,8 @@ import java.util.List;
 
 public record AgrovetOrderResponseDTO(Long id,
                                       Long farmerInputRequestId,
+                                      String farmerName,
+                                      String farmerContact,
                                       String status,
                                       BigDecimal totalAmount,
                                       LocalDateTime forwardedAt,

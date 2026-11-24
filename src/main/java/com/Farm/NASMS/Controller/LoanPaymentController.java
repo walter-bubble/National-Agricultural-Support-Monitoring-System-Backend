@@ -1,6 +1,5 @@
 package com.Farm.NASMS.Controller;
 
-import com.Farm.NASMS.Service.LoanPaymentService;
 import com.Farm.NASMS.Service.MpesaService;
 import com.Farm.NASMS.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/loan-payments")
 public class LoanPaymentController {
-    private final LoanPaymentService loanPaymentService;
     private final MpesaService mpesaService;
     @Value("${mpesa.callback.secret}")
     private String callbackSecret;
@@ -30,19 +28,21 @@ public class LoanPaymentController {
     @Value("${mpesa.callback.allowed-ips:196.201.214.200,196.201.214.206,196.201.213.114,196.201.214.207,196.201.214.208,196.201.213.44,196.201.212.127,196.201.212.138,196.201.212.129,196.201.212.136,196.201.212.74,196.201.212.69}")
     private List<String> allowedSafaricomIps;
 
-    public LoanPaymentController(LoanPaymentService loanPaymentService, MpesaService mpesaService){
-        this.loanPaymentService=loanPaymentService;
+    public LoanPaymentController(MpesaService mpesaService){
         this.mpesaService = mpesaService;
-    }
-    @PostMapping("/{id}")
-    public ResponseEntity<LoanPaymentResponse> payLoan(@PathVariable Long id, @Valid @RequestBody LoanPaymentRequest request){
-        LoanPaymentResponse loanPayment = loanPaymentService.makePayment(id,request);
-        return ResponseEntity.ok(loanPayment);
     }
     @PostMapping("/mpesa/{loanId}")
     public ResponseEntity<MpesaStkResponse> initiateMpesaPayment(@PathVariable Long loanId, @Valid @RequestBody MpesaStkRequest request) {
         MpesaStkResponse response = mpesaService.initiateStkPush(loanId, request);
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/mpesa/status/{checkoutRequestId}")
+    public ResponseEntity<LoanPaymentResponse> getMpesaPaymentStatus(@PathVariable String checkoutRequestId) {
+        return ResponseEntity.ok(mpesaService.getPaymentStatus(checkoutRequestId));
+    }
+    @GetMapping("/loan/{loanId}")
+    public ResponseEntity<List<LoanPaymentResponse>> getPaymentsForLoan(@PathVariable Long loanId) {
+        return ResponseEntity.ok(mpesaService.getPaymentsByLoan(loanId));
     }
     @PostMapping("/mpesa/callback/{secret}")
     public ResponseEntity<Void> mpesaCallback(@PathVariable String secret, @RequestBody MpesaCallbackRequest request, HttpServletRequest httpRequest) {

@@ -1,6 +1,7 @@
 package com.Farm.NASMS.model;
 
 import com.Farm.NASMS.enums.LoanStatus;
+import com.Farm.NASMS.enums.LoanType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,10 +14,10 @@ import java.util.List;
 public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;//for loan records
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "farmer_id")//connect to farmer table
+    @JoinColumn(name = "farmer_id")
     private Farmer farmer;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,7 +31,10 @@ public class Loan {
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LoanPayment> loanPayments;
 
-    //loan details
+    @OneToOne
+    @JoinColumn(name = "agrovet_order_id", unique = true)
+    private AgrovetOrder agrovetOrder;
+
     @Column(nullable = false)
     private BigDecimal amount;
 
@@ -48,16 +52,17 @@ public class Loan {
     @Enumerated(EnumType.STRING)
     private LoanStatus status;
 
-    //Audit
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LoanType loanType = LoanType.CASH_LOAN;
+
     private LocalDateTime createdAt;
 
-    //the life cycle
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    //business logic here
     public Loan() {
     }
 
@@ -86,11 +91,10 @@ public class Loan {
     }
 
     public BigDecimal getRemainingBalance() {
-        BigDecimal paid = BigDecimal.ZERO;
-        if (loanPayments != null) {
-            paid = loanPayments.stream().map(LoanPayment::getTotalAmountPaid).reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (remainingBalance != null) {
+            return remainingBalance;
         }
-        return totalPayment.subtract(paid);
+        return totalPayment != null ? totalPayment : BigDecimal.ZERO;
     }
 
     public BigDecimal calculatePenalty(LocalDateTime paymentDate) {

@@ -60,4 +60,8 @@ public class FarmerInputRequestController {
     public ResponseEntity<?> getRequestById(@PathVariable Long requestId) {
         return ResponseEntity.ok(requestService.getRequestById(requestId));
     }
+    @GetMapping("/mine")
+    public ResponseEntity<?> getMyRequests() {
+        return ResponseEntity.ok(requestService.getMyRequests());
+    }
 }

@@ -1,13 +1,14 @@
 package com.Farm.NASMS.Service;
 
+import com.Farm.NASMS.dto.LoanPackageResponse;
 import com.Farm.NASMS.model.LoanPackage;
 
 import java.util.List;
 
 public interface LoanPackageService {
-LoanPackage createLoanPackage(LoanPackage loanPackage);
-List<LoanPackage>getAllLoanPackage();
-LoanPackage getLoanPackageById(Long id);
+LoanPackageResponse createLoanPackage(LoanPackage loanPackage);
+List<LoanPackageResponse>getAllLoanPackage();
+LoanPackageResponse getLoanPackageById(Long id);
+LoanPackageResponse updateLoanPackage(Long id,LoanPackage loanPackage);
 void deleteLoanPackage(Long id);
-LoanPackage updateLoanPackage(Long id,LoanPackage loanPackage);
 }

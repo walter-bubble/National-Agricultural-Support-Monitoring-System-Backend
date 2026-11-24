@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface LoanPaymentRepository extends JpaRepository <LoanPayment,Long> {
     List<LoanPayment> findByLoan(Loan loan);
     Optional<LoanPayment> findByCheckoutRequestId(String checkoutRequestId);
+    boolean existsByTransactionCodeIgnoreCase(String transactionCode);
 }

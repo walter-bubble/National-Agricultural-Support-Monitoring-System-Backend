@@ -1,5 +1,7 @@
 package com.Farm.NASMS.Repository;
 
+import com.Farm.NASMS.enums.LoanType;
+import com.Farm.NASMS.model.AgrovetOrder;
 import com.Farm.NASMS.model.Farmer;
 import com.Farm.NASMS.model.FarmingSeason;
 import com.Farm.NASMS.model.Loan;
@@ -27,4 +29,6 @@ public interface LoanRepository  extends JpaRepository<Loan, Long> {
 
     List<Loan> findByLoanPackage_id(Long id);
     List<Loan> findByFarmerNationalId(Long nationalId);
+    boolean existsByFarmerAndLoanTypeAndStatusIn(Farmer farmer, LoanType loanType, List<LoanStatus> statuses);
+    boolean existsByAgrovetOrder(AgrovetOrder agrovetOrder);
 }
